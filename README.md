@@ -1,5 +1,9 @@
 # Nep-CLIP 🇳🇵
 
+> 🚧 **Coming Soon**  
+
+> Full codebase, translated datasets, pretrained models, training pipelines, and documentation will be released soon.
+
 Nep-CLIP is a Nepali vision-language model project inspired by CLIP, designed to bridge images and Nepali text through multimodal learning. This repository contains the complete codebase, translated datasets, pretrained models, and training/evaluation pipelines used for Nepali image-text understanding tasks.
 
 ## ✨ Features
