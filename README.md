@@ -8,8 +8,7 @@ Nep-CLIP is a Nepali vision-language model project inspired by CLIP, designed to
 ## 📊 Datasets
 
 The processed Nepali image-text pairs are available for public use. 
-
-> 🔗 **[Download Nep-CLIP Datasets (Google Drive)](https://drive.google.com/drive/folders/1kovgPWgzIfNO_Cv64rGTgCTBQDelE8k2?usp=sharing)**
+> 🔗 <a href="https://drive.google.com/drive/folders/1kovgPWgzIfNO_Cv64rGTgCTBQDelE8k2?usp=sharing" target="_blank" rel="noopener noreferrer">**Download Nep-CLIP Datasets (Google Drive)**</a>
 
 ## 📂 Dataset File Descriptions
 
