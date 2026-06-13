@@ -1,1 +1,13 @@
 .idea
+Nep_CLIP_Datasets
+Nep_CLIP_Models
+dataset
+ai_env
+venv_old
+.cache
+.ipynb_checkpoints
+.DS_Store
+.env
+__pycache__
+configuration_nllb_clip.py
+modeling_nllb_clip.py
