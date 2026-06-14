@@ -9,9 +9,9 @@ from tqdm.auto import tqdm
 
 from EvaluationDataset import EvaluationDataset
 
-FLICK_8K_CSV_FILE_NAME="Nep_CLIP_Datasets/BT_Flickr8k_nepali_output_google_translate.csv"
-FLICK_30K_CSV_FILE_NAME="Nep_CLIP_Datasets/BT_Flickr30k_nepali_output_google_translate.csv"
-XTD10_CSV_FILE_NAME="Nep_CLIP_Datasets/BT_xtd10_google_translate.csv"
+FLICK_8K_CSV_FILE_NAME="Nep_CLIP_Datasets/flickr8k_nepali_output_google_translate.csv"
+FLICK_30K_CSV_FILE_NAME="Nep_CLIP_Datasets/flickr30k_nepali_output_google_translate.csv"
+XTD10_CSV_FILE_NAME="Nep_CLIP_Datasets/xtd10_google_translate.csv"
 XM3600_CSV_FILE_NAME="Nep_CLIP_Datasets/xm3600_google_translate.csv"
 def get_device():
     if torch.cuda.is_available():
