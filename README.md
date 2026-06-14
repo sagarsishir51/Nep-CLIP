@@ -33,10 +33,10 @@ The dataset is divided into training/validation splits and specific benchmark fi
 
 ### 📁 Translated Benchmark Datasets
 *Diverse evaluation datasets translated using Google Translate and IndicTrans2.*
-* **Flickr8k**
-* **Flickr30k**
-* **XTD10**
-* **XM3600**
+* **Flickr8k**: flickr8k_nepali_output_google_translate.csv
+* **Flickr30k**: flickr30k_nepali_output_google_translate.csv
+* **XTD10**: xm3600_google_translate.csv
+* **XM3600**: xtd10_google_translate.csv
 
 ---
 
@@ -48,27 +48,15 @@ The distilled Nep-CLIP models are available for public use.
 ---
 The following distilled checkpoint files are hosted in the Google Drive directory under the model artifacts section:
 
-### 1. `RoBERTa_Nepali_110M distillation_epoch_4_step_150000.pt`
+### 1. `Nep-CLIP Model (RoBERTa based)`
+* **File Name:** RoBERTa_Nepali_110M distillation_epoch_4_step_150000.pt
 * **Description:** Pretrained PyTorch model checkpoint utilizing a 110M parameter Nepali RoBERTa architecture as the student text encoder. Aligned via knowledge distillation at Epoch 4, Step 150,000.
 
-### 2. `Shushant-nepaliBERT distillation_epoch_4_step_150000.pt`
+### 2. `Nep-CLIP Model (BERTa based)`
+* **File Name:** Shushant-nepaliBERT distillation_epoch_4_step_150000.pt
 * **Description:** Pretrained PyTorch model checkpoint utilizing the Shushant-nepaliBERT architecture as the student text encoder. Aligned via knowledge distillation at Epoch 4, Step 150,000.
 
 ---
-
-## 📓 Notebooks & Execution Order
-
-Below is the structured list of Jupyter notebooks included in this repository to replicate the translation, training, and evaluation pipelines:
-
-### 1. `Translate_with_IndicTrans2.ipynb`
-* **Description:** The text translation pipeline that uses the `IndicTrans2` model to translate English image captions into high-quality Nepali text datasets.
-
-### 2. `Preprocessed_CC3M_and_MSCOCO_with_Val_loss_Feature_Distillation.ipynb`
-* **Description:** Handles data preprocessing (PP) and runs the main Knowledge Distillation (KD) training loop. It transfers vision-language features from the teacher model to the Nepali student model while monitoring validation loss.
-
-
----
-
 # 🛠️ Setup and Installation Guide
 
 Follow these steps to set up the development environment and reproduce the evaluation results.
