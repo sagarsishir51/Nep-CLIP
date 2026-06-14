@@ -1,0 +1,8 @@
+transformers
+pandas
+torch
+Pillow
+python-dotenv
+multilingual-clip
+scikit-learn
+torchvision

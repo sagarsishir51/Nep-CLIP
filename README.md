@@ -2,6 +2,8 @@
 
 Nep-CLIP is a Nepali vision-language model project inspired by CLIP, designed to bridge images and Nepali text through multimodal learning. This repository contains the complete codebase, translated datasets, pretrained models, and training/evaluation pipelines used for Nepali image-text understanding tasks.
 
+---
+
 ## 📊 Datasets
 
 The processed Nepali image-text pairs are available for public use. 
@@ -64,8 +66,71 @@ Below is the structured list of Jupyter notebooks included in this repository to
 ### 2. `Preprocessed_CC3M_and_MSCOCO_with_Val_loss_Feature_Distillation.ipynb`
 * **Description:** Handles data preprocessing (PP) and runs the main Knowledge Distillation (KD) training loop. It transfers vision-language features from the teacher model to the Nepali student model while monitoring validation loss.
 
-### 3. `Evaluation_of_Image_Retrieval_Task.ipynb`
-* **Description:** Benchmarking pipeline for Cross-Modal Retrieval. It evaluates the trained model on Image-to-Text and Text-to-Image retrieval tasks using metrics like Recall@K and MRR.
 
-### 4. `Evaluation_of_ZSC_Task.ipynb`
-* **Description:** Evaluation pipeline for Zero-Shot Classification (ZSC). Tests the model's out-of-domain classification capability across different Nepali text prompts and datasets.
+---
+
+# 🛠️ Setup and Installation Guide
+
+Follow these steps to set up the development environment and reproduce the evaluation results.
+
+---
+
+## Prerequisites
+
+- **Python 3.9 or higher** — verify with `python --version`
+- **Git** — to clone the repository
+- **pip** — comes bundled with Python 3.9+
+
+---
+
+## Step 2: Create and Activate a Virtual Environment
+
+**Linux / macOS**
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+**Windows**
+```bash
+python3 -m venv venv
+venv\Scripts\activate
+```
+
+> You should see `(venv)` in your terminal prompt once the environment is active.
+
+---
+
+## Step 3: Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+---
+
+## Step 4: Download Required Datasets
+
+```bash
+python download_dataset.py
+```
+
+This script will fetch and save the necessary datasets to their expected directories.  
+Ensure you have a stable internet connection and sufficient disk space before running.
+
+---
+
+## Step 5: Run Image Retrieval Evaluation
+
+```bash
+python evaluate_image_retrieval.py
+```
+
+Results will be printed to the console, depending on the script configuration.
+
+---
+
+## Notes
+
+- Always activate the virtual environment before running any scripts.
+- If you update dependencies, re-run `pip install -r requirements.txt`.
+- To deactivate the virtual environment when done: `deactivate`
