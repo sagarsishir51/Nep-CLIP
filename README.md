@@ -40,6 +40,10 @@ The dataset is divided into training/validation splits and specific benchmark fi
 
 ## 🧠 Pretrained Models
 
+The distilled Nep-CLIP models are available for public use. 
+> 🔗 <a href="https://drive.google.com/drive/u/1/folders/1ZY_gS27NwRj5RoZFb-yCj9kh-i09WjCh?usp=sharing" target="_blank" rel="noopener noreferrer">**Download Nep-CLIP Models (Google Drive)**</a>
+
+---
 The following distilled checkpoint files are hosted in the Google Drive directory under the model artifacts section:
 
 ### 1. `RoBERTa_Nepali_110M distillation_epoch_4_step_150000.pt`
