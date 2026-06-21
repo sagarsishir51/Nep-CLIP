@@ -78,7 +78,7 @@ Follow these steps to set up the development environment and reproduce the evalu
 
 ## Prerequisites
 
-- **Python 3.9 or higher** — verify with `python --version`
+- **Python 3.11** — verify with `python --version`
 - **Git** — to clone the repository
 - **pip** — comes bundled with Python 3.9+
 
