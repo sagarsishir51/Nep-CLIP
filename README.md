@@ -99,18 +99,26 @@ pip install -r requirements.txt
 ## Step 4: Download Required Datasets
 
 ```bash
-python download_dataset.py
+python3 download_dataset.py [-d {flickr8k,flickr30k,xtd10,xm3600,all}]
 ```
 
-This script will fetch and save the necessary datasets to their expected directories.  
-Ensure you have a stable internet connection and sufficient disk space before running.
+| Flag | Default | Description |
+|------|---------|-------------|
+| `-d` | `all` | Dataset to download |
 
----
+**Examples:**
+```bash
+python3 download_dataset.py            # download all datasets
+python3 download_dataset.py -d flickr8k  # Flickr8k only
+python3 download_dataset.py -d xtd10     # XTD10 only
+```
+
+Ensure you have a stable internet connection and sufficient disk space before running.
 
 ## Step 5: Run Image Retrieval Evaluation
 
 ```bash
-python evaluate_image_retrieval.py
+python3 evaluate_image_retrieval.py
 ```
 
 Results will be printed to the console, depending on the script configuration.

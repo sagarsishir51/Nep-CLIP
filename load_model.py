@@ -12,32 +12,38 @@ TEACHER_ID = "openai/clip-vit-base-patch32"
 
 DISTILLED_MODELS_CONFIG = {
     "BERT": {
+        "name":"BERT",
         "id": "Shushant/nepaliBERT",
         "teacher_id": "openai/clip-vit-base-patch32",
         "file_name": "Shushant-nepaliBERT distillation_epoch_4_step_150000.pt"
     },
-    # "RoBERTa":
-    #     {
-    #         "id": "IRIISNEPAL/RoBERTa_Nepali_110M",
-    #          "teacher_id": "openai/clip-vit-base-patch32",
-    #         "file_name": "RoBERTa_Nepali_110M distillation_epoch_4_step_150000.pt"
-    #     },
+    "RoBERTa":
+        {
+            "name": "BERT",
+            "id": "IRIISNEPAL/RoBERTa_Nepali_110M",
+             "teacher_id": "openai/clip-vit-base-patch32",
+            "file_name": "RoBERTa_Nepali_110M distillation_epoch_4_step_150000.pt"
+        },
     # "NLLB":
     #     {
+    #         "name": "NLLB",
     #         "id": "facebook/nllb-200-distilled-600M",
     #         "teacher_id":"openai/clip-vit-base-patch32",
     #         "repo_id":"visheratin/nllb-clip-base",
     #     },
     # "MCLIP":{
+    #     "name": "MCLIP",
     #     "id": "M-CLIP/XLM-Roberta-Large-Vit-B-32",
     #     "teacher_id":"openai/clip-vit-base-patch32",
     # },
-    # "CLIP-English":{
-    #         "teacher_id":"openai/clip-vit-base-patch32",
-    #     },
-    # "CLIP (Nepali input)": {
-    #     "teacher_id": "openai/clip-vit-base-patch32",
-    # }
+    "CLIP-English":{
+        "name": "CLIP-English",
+        "teacher_id":"openai/clip-vit-base-patch32",
+        },
+    "CLIP (Nepali input)": {
+        "name": "CLIP (Nepali input)",
+        "teacher_id": "openai/clip-vit-base-patch32",
+    }
 }
 
 def get_all_models_with_loaded_instance(model_folder, device):
