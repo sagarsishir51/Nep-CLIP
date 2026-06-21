@@ -4,6 +4,7 @@ from tqdm.auto import tqdm
 
 class CLIP_Model:
     def __init__(self,config):
+        self.name = config["name"]
         teacher_id = config["teacher_id"]
         self.model = CLIPModel.from_pretrained(teacher_id)
         self.processor = CLIPProcessor.from_pretrained(teacher_id)
@@ -13,7 +14,7 @@ class CLIP_Model:
         text_embs = []
 
         with torch.no_grad():
-            for i in tqdm(range(0, len(texts), batch_size), desc="Encoding Text"):
+            for i in tqdm(range(0, len(texts), batch_size), desc=f"Encoding Text for {self.name}"):
                 batch_texts = texts[i: i + batch_size]
 
                 # Tokenize the raw strings — CLIP needs its own processor
@@ -44,7 +45,7 @@ class CLIP_Model:
         img_embs = []
         self.model.to(device).eval()
         with torch.no_grad():
-            for i in tqdm(range(0, len(image_values), batch_size), desc="Encoding Images"):
+            for i in tqdm(range(0, len(image_values), batch_size), desc=f"Encoding Images for {self.name}"):
                 batch_pixels = image_values[i: i + batch_size].to(device)
                 img_f = self.model.get_image_features(pixel_values=batch_pixels)
                 # Handle potential pooler_output or raw output depending on CLIP version

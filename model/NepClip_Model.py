@@ -7,6 +7,7 @@ from model.NepClipEncoder import NepClipEncoder
 
 class NepClip_Model:
     def __init__(self,config,model_path,device):
+        self.name = config["name"]
         teacher_id = config["teacher_id"]
         student_id = config["id"]
         self.processor = CLIPProcessor.from_pretrained(teacher_id)
@@ -66,7 +67,7 @@ class NepClip_Model:
 
         num_texts = tokenized_inputs['input_ids'].shape[0]
         with torch.no_grad():
-            for i in tqdm(range(0, num_texts, batch_size), desc=f"Encoding Text"):
+            for i in tqdm(range(0, num_texts, batch_size), desc=f"Encoding Text for {self.name}"):
                 batch_text = {k: v[i: i + batch_size].to(device) for k, v in tokenized_inputs.items()}
                 txt_f = self.nep_clip_encoder(batch_text)
                 txt_f = txt_f / txt_f.norm(dim=-1, keepdim=True)
@@ -78,7 +79,7 @@ class NepClip_Model:
         img_embs = []
         self.model.to(device).eval()
         with torch.no_grad():
-            for i in tqdm(range(0, len(image_values), batch_size), desc="Encoding Images"):
+            for i in tqdm(range(0, len(image_values), batch_size), desc=f"Encoding Images for {self.name}"):
                 batch_pixels = image_values[i: i + batch_size].to(device)
                 img_f = self.model.get_image_features(pixel_values=batch_pixels)
                 # Handle potential pooler_output or raw output depending on CLIP version

@@ -2,6 +2,8 @@
 
 Nep-CLIP is a Nepali vision-language model project inspired by CLIP, designed to bridge images and Nepali text through multimodal learning. This repository contains the complete codebase, translated datasets, pretrained models, and training/evaluation pipelines used for Nepali image-text understanding tasks.
 
+---
+
 ## 📊 Datasets
 
 The processed Nepali image-text pairs are available for public use. 
@@ -31,37 +33,143 @@ The dataset is divided into training/validation splits and specific benchmark fi
 
 ### 📁 Translated Benchmark Datasets
 *Diverse evaluation datasets translated using Google Translate and IndicTrans2.*
-* **Flickr8k**
-* **Flickr30k**
-* **XTD10**
-* **XM3600**
+* **Flickr8k**: flickr8k_nepali_output_google_translate.csv
+* **Flickr30k**: flickr30k_nepali_output_google_translate.csv
+* **XTD10**: xm3600_google_translate.csv
+* **XM3600**: xtd10_google_translate.csv
 
 ---
 
 ## 🧠 Pretrained Models
 
+The distilled Nep-CLIP models are available for public use. 
+> 🔗 <a href="https://drive.google.com/drive/u/1/folders/1ZY_gS27NwRj5RoZFb-yCj9kh-i09WjCh?usp=sharing" target="_blank" rel="noopener noreferrer">**Download Nep-CLIP Models (Google Drive)**</a>
+
+---
 The following distilled checkpoint files are hosted in the Google Drive directory under the model artifacts section:
 
-### 1. `RoBERTa_Nepali_110M distillation_epoch_4_step_150000.pt`
+### 1. `Nep-CLIP Model (RoBERTa based)`
+* **File Name:** RoBERTa_Nepali_110M distillation_epoch_4_step_150000.pt
 * **Description:** Pretrained PyTorch model checkpoint utilizing a 110M parameter Nepali RoBERTa architecture as the student text encoder. Aligned via knowledge distillation at Epoch 4, Step 150,000.
 
-### 2. `Shushant-nepaliBERT distillation_epoch_4_step_150000.pt`
+### 2. `Nep-CLIP Model (BERT based)`
+* **File Name:** Shushant-nepaliBERT distillation_epoch_4_step_150000.pt
 * **Description:** Pretrained PyTorch model checkpoint utilizing the Shushant-nepaliBERT architecture as the student text encoder. Aligned via knowledge distillation at Epoch 4, Step 150,000.
 
 ---
 
-## 📓 Notebooks & Execution Order
+## 📋 Evaluated Models
 
-Below is the structured list of Jupyter notebooks included in this repository to replicate the translation, training, and evaluation pipelines:
+The following models were evaluated for image-text retrieval and zero-shot classification:
 
-### 1. `Translate_with_IndicTrans2.ipynb`
-* **Description:** The text translation pipeline that uses the `IndicTrans2` model to translate English image captions into high-quality Nepali text datasets.
+- **BERT** (Shushant-nepaliBERT student encoder)
+- **RoBERTa** (Nepali RoBERTa student encoder)
+- **NLLB**
+- **MCLIP**
+- **CLIP (English)**
+- **CLIP (Nepali input)**
 
-### 2. `Preprocessed_CC3M_and_MSCOCO_with_Val_loss_Feature_Distillation.ipynb`
-* **Description:** Handles data preprocessing (PP) and runs the main Knowledge Distillation (KD) training loop. It transfers vision-language features from the teacher model to the Nepali student model while monitoring validation loss.
+---
+# 🛠️ Setup and Installation Guide
 
-### 3. `Evaluation_of_Image_Retrieval_Task.ipynb`
-* **Description:** Benchmarking pipeline for Cross-Modal Retrieval. It evaluates the trained model on Image-to-Text and Text-to-Image retrieval tasks using metrics like Recall@K and MRR.
+Follow these steps to set up the development environment and reproduce the evaluation results.
 
-### 4. `Evaluation_of_ZSC_Task.ipynb`
-* **Description:** Evaluation pipeline for Zero-Shot Classification (ZSC). Tests the model's out-of-domain classification capability across different Nepali text prompts and datasets.
+---
+
+## Prerequisites
+
+- **Python 3.11** — verify with `python --version`
+- **Git** — to clone the repository
+- **pip** — comes bundled with Python 3.9+
+
+---
+
+## Step 2: Create and Activate a Virtual Environment
+
+Create the environment using **Python 3.11** specifically.
+
+**Check if Python 3.11 is installed:**
+```bash
+python3 --version
+```
+
+If this shows a version other than 3.11, follow the steps below to install Python 3.11 specifically.
+
+**If not installed:**
+
+**Linux (Ubuntu/Debian)**
+```bash
+sudo apt update
+sudo apt install python3.11 python3.11-venv
+```
+
+**macOS (using Homebrew)**
+```bash
+brew install python@3.11
+```
+
+**Windows**
+Download the installer from the [official Python website](https://www.python.org/downloads/release/python-3110/) and run it. Make sure to check **"Add Python to PATH"** during installation.
+
+**Create and activate the virtual environment:**
+
+**Linux / macOS**
+```bash
+python3.11 -m venv venv_nep_clip
+source venv_nep_clip/bin/activate
+```
+
+**Windows**
+```bash
+python3.11 -m venv venv_nep_clip
+venv_nep_clip\Scripts\activate
+```
+
+> You should see `(venv_nep_clip)` in your terminal prompt once the environment is active.
+
+---
+
+## Step 3: Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+---
+## Step 4: Download Required Datasets
+
+```bash
+python3 download_dataset.py [-d {flickr8k,flickr30k,xtd10,xm3600,all}]
+```
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `-d` | `all` | Dataset to download |
+
+**Examples:**
+```bash
+python3 download_dataset.py            # download all datasets
+python3 download_dataset.py -d flickr8k  # Flickr8k only
+python3 download_dataset.py -d xtd10     # XTD10 only
+```
+
+Ensure you have a stable internet connection and sufficient disk space before running.
+
+## Step 5: Run Image Retrieval Evaluation
+
+```bash
+python3 evaluate_image_retrieval.py
+```
+
+Results will be printed to the console, depending on the script configuration.
+
+---
+> ⚠️ **Disclaimer (NLLB & MCLIP):** By default, `transformers==5.12.1` is installed. To use the NLLB and MCLIP models, you need `transformers==4.38.2` instead:
+> ```bash
+> pip uninstall transformers -y
+> pip install transformers==4.38.2
+> ```
+## Notes
+
+- Always activate the virtual environment before running any scripts.
+- If you update dependencies, re-run `pip install -r requirements.txt`.
+- To deactivate the virtual environment when done: `deactivate`

@@ -2,8 +2,7 @@
 Nep_CLIP_Datasets
 Nep_CLIP_Models
 dataset
-ai_env
-venv_old
+venv_nep_clip
 .cache
 .ipynb_checkpoints
 .DS_Store

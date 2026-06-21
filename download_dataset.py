@@ -1,16 +1,15 @@
 import argparse
 import math
-import os
 import shutil
 import threading
 import urllib.parse
 import urllib.request
 import zipfile
+import os
+import tarfile
 from concurrent.futures import ThreadPoolExecutor, as_completed
-# Added this missing import needed for flickr30k
 from huggingface_hub import hf_hub_download
 from tqdm import tqdm
-import torchvision.transforms as transforms
 import torchvision
 from dotenv import load_dotenv
 from huggingface_hub import snapshot_download
@@ -254,11 +253,6 @@ def download_karpathy_splits():
     print("  Current files in directory:", os.listdir(base_dir))
 
 
-import os
-import tarfile
-import urllib.request
-
-
 def download_xtd10_dataset():
     """
     Downloads the XTD10 image archive, creates the target folder structure
@@ -348,34 +342,10 @@ def download_xm3600_dataset():
     except Exception as e:
         print(f"  ❌ Error downloading dataset: {e}")
 
-def download_cifar_dataset():
-    base_dir = "dataset/cifar"
-    base_dir_cifar100 = "dataset/cifar"
-    os.makedirs(base_dir, exist_ok=True)
-    transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-    ])
-
-    # Load the test dataset (train=False is the key here)
-    test_set = torchvision.datasets.CIFAR10(
-        root=base_dir,
-        train=False,
-        download=True,
-        transform=transform
-    )
-
-    cifar100_test_set = torchvision.datasets.CIFAR100(
-        root=base_dir_cifar100,
-        train=False,
-        download=True,
-        transform=transform
-    )
-
 # --- Configuration & Execution Setup ---
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Download Flickr8k and Flickr30k datasets."
+        description="Download datasets for image retrieval."
     )
 
     # Dataset choices configuration
@@ -383,12 +353,12 @@ if __name__ == "__main__":
         "-d",
         "--dataset",
         type=str,
-        default="both",
-        choices=["flickr8k", "flickr30k", "cifar","xtd10","xm3600","all"],
+        default="all",
+        choices=["flickr8k", "flickr30k","xtd10","xm3600","all"],
         help="Specify which dataset to download (default: 'all').",
     )
 
-    # Thread configurations for Flickr8k
+    # Thread configurations
     parser.add_argument(
         "-t",
         "--threads",
@@ -400,17 +370,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Route execution based on command line choices
-    if args.dataset in ["flickr8k", "both"]:
+    if args.dataset in ["flickr8k", "all"]:
         print("=== Starting Flickr8k Download ===")
         download_flickr8k_dataset(num_threads=args.threads)
 
-    if args.dataset in ["flickr30k", "both"]:
+    if args.dataset in ["flickr30k", "all"]:
         print("\n=== Starting Flickr30k Download ===")
         download_flickr30k_dataset()
-
-    if args.dataset in ["cifar", "all"]:
-        print("\n=== Starting CIFAR Download ===")
-        download_cifar_dataset()
 
     if args.dataset in ["xtd10", "all"]:
         print("\n=== Starting XTD10 Download ===")

@@ -6,14 +6,12 @@ import torch
 import pandas as pd
 from PIL import Image
 from tqdm.auto import tqdm
-import torchvision.transforms as transforms
-import torchvision
 
 from EvaluationDataset import EvaluationDataset
 
-FLICK_8K_CSV_FILE_NAME="Nep_CLIP_Datasets/BT_Flickr8k_nepali_output_google_translate.csv"
-FLICK_30K_CSV_FILE_NAME="Nep_CLIP_Datasets/BT_Flickr30k_nepali_output_google_translate.csv"
-XTD10_CSV_FILE_NAME="Nep_CLIP_Datasets/BT_xtd10_google_translate.csv"
+FLICK_8K_CSV_FILE_NAME="Nep_CLIP_Datasets/flickr8k_nepali_output_google_translate.csv"
+FLICK_30K_CSV_FILE_NAME="Nep_CLIP_Datasets/flickr30k_nepali_output_google_translate.csv"
+XTD10_CSV_FILE_NAME="Nep_CLIP_Datasets/xtd10_google_translate.csv"
 XM3600_CSV_FILE_NAME="Nep_CLIP_Datasets/xm3600_google_translate.csv"
 def get_device():
     if torch.cuda.is_available():
@@ -219,46 +217,45 @@ def get_test_images_for_xm3600(xm3600_data, image_path):
     return test_images_xm, test_captions_xm,test_eng_captions_xm
 
 # DATASET_LIST = ["FLICK8K","FLICK30K","XTD10","XM3600"]
-# DATASET_LIST = ["FLICK8K"]
-DATASET_LIST = ["XM3600"]
-ZSC_DATASET_LIST = ["CIFAR100"]
+DATASET_LIST = ["FLICK8K"]
+# DATASET_LIST = ["XM3600"]
 
 def preprocess_all_datasets(clip_processor):
     processed_datasets = {}
     test_images = []
-    test_texts = []
-    test_eng_texts = []
+    test_captions = []
+    test_eng_captions = []
     captions_per_image = 0
     for dataset_name in DATASET_LIST:
         if dataset_name == "FLICK8K":
             translated_dataset = pd.read_csv(FLICK_8K_CSV_FILE_NAME)
             test_img_ids = get_test_images("dataset/karpathy/dataset_flickr8k.json")
             image_path = "dataset/flickr8k/images/Flicker8k_Dataset/"
-            test_images,test_texts,test_eng_texts = get_test_images_for_flickr(test_img_ids=test_img_ids,image_path=image_path,flickr_dataset=translated_dataset)
+            test_images,test_captions,test_eng_captions = get_test_images_for_flickr(test_img_ids=test_img_ids,image_path=image_path,flickr_dataset=translated_dataset)
             captions_per_image = 5
         elif dataset_name == "FLICK30K":
             translated_dataset = pd.read_csv(FLICK_30K_CSV_FILE_NAME)
             test_img_ids = get_test_images("dataset/karpathy/dataset_flickr30k.json")
             image_path = "dataset/flickr30k/images/"
-            test_images,test_texts,test_eng_texts = get_test_images_for_flickr(test_img_ids=test_img_ids,image_path=image_path,flickr_dataset=translated_dataset)
+            test_images,test_captions,test_eng_captions = get_test_images_for_flickr(test_img_ids=test_img_ids,image_path=image_path,flickr_dataset=translated_dataset)
             captions_per_image = 5
         elif dataset_name == "XTD10":
             translated_dataset = pd.read_csv(XTD10_CSV_FILE_NAME)
             image_path = "dataset/xtd10/"
-            test_images,test_texts,test_eng_texts = get_test_images_for_xtd10(image_path=image_path,xtd10_data=translated_dataset)
+            test_images,test_captions,test_eng_captions = get_test_images_for_xtd10(image_path=image_path,xtd10_data=translated_dataset)
             captions_per_image = 1
         elif dataset_name == "XM3600":
             translated_dataset = pd.read_csv(XM3600_CSV_FILE_NAME)
             image_path = "dataset/xm3600/images/"
-            test_images,test_texts,test_eng_texts = get_test_images_for_xm3600(xm3600_data=translated_dataset,image_path=image_path)
+            test_images,test_captions,test_eng_captions = get_test_images_for_xm3600(xm3600_data=translated_dataset,image_path=image_path)
             captions_per_image = 2
         else:
             print(f"Dataset {dataset_name} not found.")
-        if len(test_images)>0 and len(test_texts)>0:
+        if len(test_images)>0 and len(test_captions)>0:
             print(f"Preprocessing dataset {dataset_name}")
             print(f"test_images {len(test_images)}")
-            print(f"test_texts {len(test_texts)}")
-            dataset = EvaluationDataset(image_paths=test_images, test_texts=test_texts,test_eng_texts=test_eng_texts, image_processor=clip_processor)
+            print(f"test_captions {len(test_captions)}")
+            dataset = EvaluationDataset(image_paths=test_images, captions=test_captions,eng_captions=test_eng_captions, image_processor=clip_processor)
             image_values, text_inputs,eng_text_inputs = dataset.get_all_data()
             processed_datasets[dataset_name] = {
                 "image_values": image_values,
@@ -267,84 +264,5 @@ def preprocess_all_datasets(clip_processor):
                 "captions_per_image":captions_per_image
             }
         else:
-            print(f"Skipping dataset {dataset_name} as number of images is {len(test_images)} and captions is {len(test_texts)}")
-    return processed_datasets
-
-
-
-def preprocess_zsc_datasets(clip_processor):
-    processed_datasets = {}
-    test_images = []
-    test_texts = []
-    test_eng_texts = []
-    captions_per_image = 0
-    gt_labels=[]
-    for dataset_name in ZSC_DATASET_LIST:
-        if dataset_name == "CIFAR10":
-            transform = transforms.Compose([
-                transforms.ToTensor(),
-                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-            ])
-            root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dataset/cifar10")
-
-            cifar10_test = torchvision.datasets.CIFAR10(
-                root=root,
-                train=False,
-                download=False,
-                transform=transform
-            )
-            gt_labels = cifar10_test.targets
-            test_eng_texts = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
-            test_texts = ['हवाईजहाज', 'मोटरकार', 'चरा', 'बिरालो', 'मृग', 'कुकुर', 'भ्यागुतो', 'घोडा', 'पानी जहाज',
-                             'ट्रक']
-            test_images = []
-            for i in range(len(cifar10_test)):
-                img, _ = cifar10_test[i]
-                test_images.append(img)
-        elif dataset_name == "CIFAR100":
-            transform = transforms.Compose([
-                transforms.ToTensor(),
-                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-            ])
-            root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dataset/cifar100test")
-            print("root",root)
-            cifar100_test = torchvision.datasets.CIFAR100(
-                root=root,
-                train=False,
-                download=False,
-                transform=transform
-            )
-            cifar100_test_loader = torch.utils.data.DataLoader(
-                cifar100_test,
-                batch_size=64,
-                shuffle=False,
-                num_workers=2
-            )
-            gt_labels = cifar100_test.targets
-            test_eng_texts = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship',
-                              'truck']
-            test_texts = ['हवाईजहाज', 'मोटरकार', 'चरा', 'बिरालो', 'मृग', 'कुकुर', 'भ्यागुतो', 'घोडा', 'पानी जहाज',
-                          'ट्रक']
-            test_images = []
-            for i in range(len(cifar100_test)):
-                img, _ = cifar100_test[i]
-                test_images.append(img)
-        else:
-            print(f"Dataset {dataset_name} not found.")
-        if len(test_images)>0 and len(test_texts)>0:
-            print(f"Preprocessing dataset {dataset_name}")
-            print(f"test_images {len(test_images)}")
-            print(f"test_texts {len(test_texts)}")
-            dataset = EvaluationDataset(image_paths=test_images, test_texts=test_texts,test_eng_texts=test_eng_texts, image_processor=clip_processor)
-            image_values, text_inputs,eng_text_inputs = dataset.get_all_data()
-            processed_datasets[dataset_name] = {
-                "image_values": image_values,
-                "text_inputs": text_inputs,
-                "eng_text_inputs": eng_text_inputs,
-                "captions_per_image":captions_per_image,
-                "gt_labels":gt_labels
-            }
-            exit(0)
-        else:
-            print(f"Skipping dataset {dataset_name} as number of images is {len(test_images)} and captions is {len(test_texts)}")
+            print(f"Skipping dataset {dataset_name} as number of images is {len(test_images)} and captions is {len(test_captions)}")
     return processed_datasets
