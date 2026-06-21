@@ -52,9 +52,22 @@ The following distilled checkpoint files are hosted in the Google Drive director
 * **File Name:** RoBERTa_Nepali_110M distillation_epoch_4_step_150000.pt
 * **Description:** Pretrained PyTorch model checkpoint utilizing a 110M parameter Nepali RoBERTa architecture as the student text encoder. Aligned via knowledge distillation at Epoch 4, Step 150,000.
 
-### 2. `Nep-CLIP Model (BERTa based)`
+### 2. `Nep-CLIP Model (BERT based)`
 * **File Name:** Shushant-nepaliBERT distillation_epoch_4_step_150000.pt
 * **Description:** Pretrained PyTorch model checkpoint utilizing the Shushant-nepaliBERT architecture as the student text encoder. Aligned via knowledge distillation at Epoch 4, Step 150,000.
+
+---
+
+## 📋 Evaluated Models
+
+The following models were evaluated for image-text retrieval and zero-shot classification:
+
+- **BERT** (Shushant-nepaliBERT student encoder)
+- **RoBERTa** (Nepali RoBERTa student encoder)
+- **NLLB**
+- **MCLIP**
+- **CLIP (English)**
+- **CLIP (Nepali input)**
 
 ---
 # 🛠️ Setup and Installation Guide
@@ -73,19 +86,46 @@ Follow these steps to set up the development environment and reproduce the evalu
 
 ## Step 2: Create and Activate a Virtual Environment
 
+Create the environment using **Python 3.11** specifically.
+
+**Check if Python 3.11 is installed:**
+```bash
+python3 --version
+```
+
+If this shows a version other than 3.11, follow the steps below to install Python 3.11 specifically.
+
+**If not installed:**
+
+**Linux (Ubuntu/Debian)**
+```bash
+sudo apt update
+sudo apt install python3.11 python3.11-venv
+```
+
+**macOS (using Homebrew)**
+```bash
+brew install python@3.11
+```
+
+**Windows**
+Download the installer from the [official Python website](https://www.python.org/downloads/release/python-3110/) and run it. Make sure to check **"Add Python to PATH"** during installation.
+
+**Create and activate the virtual environment:**
+
 **Linux / macOS**
 ```bash
-python3 -m venv venv
-source venv/bin/activate
+python3.11 -m venv venv_nep_clip
+source venv_nep_clip/bin/activate
 ```
 
 **Windows**
 ```bash
-python3 -m venv venv
-venv\Scripts\activate
+python3.11 -m venv venv_nep_clip
+venv_nep_clip\Scripts\activate
 ```
 
-> You should see `(venv)` in your terminal prompt once the environment is active.
+> You should see `(venv_nep_clip)` in your terminal prompt once the environment is active.
 
 ---
 
@@ -95,7 +135,6 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 ---
-
 ## Step 4: Download Required Datasets
 
 ```bash
@@ -124,7 +163,11 @@ python3 evaluate_image_retrieval.py
 Results will be printed to the console, depending on the script configuration.
 
 ---
-
+> ⚠️ **Disclaimer (NLLB & MCLIP):** By default, `transformers==5.12.1` is installed. To use the NLLB and MCLIP models, you need `transformers==4.38.2` instead:
+> ```bash
+> pip uninstall transformers -y
+> pip install transformers==4.38.2
+> ```
 ## Notes
 
 - Always activate the virtual environment before running any scripts.

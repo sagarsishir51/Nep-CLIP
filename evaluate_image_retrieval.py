@@ -45,10 +45,11 @@ def run_full_report(model_configs,image_values,text_inputs,eng_text_inputs, devi
 if __name__ == "__main__":
     DEVICE = get_device()
     clip_processor = CLIPProcessor.from_pretrained(TEACHER_ID)
+    print("============================================= Image Retrieval Process for CLIP Model started =============================================")
     model_configs = get_all_models_with_loaded_instance(model_folder=LOCAL_MODEL_PATH, device=DEVICE)
     processed_datasets = preprocess_all_datasets(clip_processor=clip_processor)
     for dataset_name, data in processed_datasets.items():
-        print(f"===================================================================Processing {dataset_name}===================================================================")
+        print(f"=================================================================== Processing {dataset_name} ===================================================================")
         image_values = data["image_values"]
         text_inputs = data["text_inputs"]
         eng_text_inputs = data["eng_text_inputs"]

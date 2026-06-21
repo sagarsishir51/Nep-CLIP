@@ -216,8 +216,8 @@ def get_test_images_for_xm3600(xm3600_data, image_path):
 
     return test_images_xm, test_captions_xm,test_eng_captions_xm
 
-DATASET_LIST = ["FLICK8K","FLICK30K","XTD10","XM3600"]
-# DATASET_LIST = ["FLICK8K"]
+# DATASET_LIST = ["FLICK8K","FLICK30K","XTD10","XM3600"]
+DATASET_LIST = ["FLICK8K"]
 # DATASET_LIST = ["XM3600"]
 
 def preprocess_all_datasets(clip_processor):

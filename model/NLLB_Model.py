@@ -6,6 +6,7 @@ from tqdm.auto import tqdm
 class NLLB_Model:
     def __init__(self,config):
         self.name = config["name"]
+        student_id = config["id"]
         repo_id = config["repo_id"]
         teacher_id = config["teacher_id"]
 
@@ -16,7 +17,7 @@ class NLLB_Model:
 
         self.model = NLLBCLIPModel.from_pretrained(repo_id)
         self.processor = CLIPProcessor.from_pretrained(teacher_id)
-        self.tokenizer = AutoTokenizer.from_pretrained(self.student_id)
+        self.tokenizer = AutoTokenizer.from_pretrained(student_id)
 
     def get_text_features(self, texts, batch_size=256, device="cuda"):
         self.model.to(device).eval()
