@@ -113,7 +113,7 @@ The following figure summarizes the image-text retrieval performance of Nep-CLIP
 <p>
   <img src="assets/nepclip_image_retrieval_benchmark_results.png"
        alt="Nep-CLIP IR Benchmark Results"
-       width="457">
+       width="1156">
 </p>
 
 **Figure:** Cross-modal retrieval performance on the Nepali datasets. **w/ PP** denotes models trained with preprocessing. **Bold** values indicate the best performance among the distilled and multilingual models, excluding the English upper-bound (CLIP-English*).
