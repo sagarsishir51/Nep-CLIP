@@ -6,170 +6,224 @@ Nep-CLIP is a Nepali vision-language model project inspired by CLIP, designed to
 
 ## 📊 Datasets
 
-The processed Nepali image-text pairs are available for public use. 
-> 🔗 <a href="https://drive.google.com/drive/folders/1kovgPWgzIfNO_Cv64rGTgCTBQDelE8k2?usp=sharing" target="_blank" rel="noopener noreferrer">**Download Nep-CLIP Datasets (Google Drive)**</a>
+The processed Nepali image-text pairs are available for public use.
+
+> 🔗 <a href="https://drive.google.com/drive/folders/1kovgPWgzIfNO_Cv64rGTgCTBQDelE8k2?usp=sharing" target="_blank" rel="noopener noreferrer"><b>Download Nep-CLIP Datasets (Google Drive)</b></a>
 
 ---
 
 ## 📂 Dataset File Descriptions
 
-The dataset is divided into training/validation splits and specific benchmark files.
+The dataset is divided into training/validation splits and benchmark evaluation datasets.
 
 ### 📁 Training Data
-*Contains high-volume data for the Knowledge Distillation (KD) process.*
 
-#### `CC3M Parquet Files (568 files) and MSCOCO Parquet File (1 file)`
-* **Format:** Apache Parquet (`.parquet`)
+Contains high-volume image-text pairs used for Knowledge Distillation (KD).
+
+* **CC3M Parquet Files (568 files)**
+* **MSCOCO Parquet File (1 file)**
+
+**Format:** Apache Parquet (`.parquet`)
 
 ---
 
 ### 📁 Validation Data
-*Contains standard splits for monitoring model performance during training.*
 
-#### `CC3M Parquet Files (3 files) and MSCOCO Parquet File (1 file)`
-* **Format:** Apache Parquet (`.parquet`)
+Contains validation splits for monitoring model performance during training.
+
+* **CC3M Parquet Files (3 files)**
+* **MSCOCO Parquet File (1 file)**
+
+**Format:** Apache Parquet (`.parquet`)
 
 ---
 
 ### 📁 Translated Benchmark Datasets
-*Diverse evaluation datasets translated using Google Translate and IndicTrans2.*
-* **Flickr8k**: flickr8k_nepali_output_google_translate.csv
-* **Flickr30k**: flickr30k_nepali_output_google_translate.csv
-* **XTD10**: xm3600_google_translate.csv
-* **XM3600**: xtd10_google_translate.csv
+
+Evaluation datasets translated into Nepali using Google Translate and IndicTrans2.
+
+| Dataset   | File                                           |
+| --------- | ---------------------------------------------- |
+| Flickr8k  | `flickr8k_nepali_output_google_translate.csv`  |
+| Flickr30k | `flickr30k_nepali_output_google_translate.csv` |
+| XTD10     | `xtd10_google_translate.csv`                   |
+| XM3600    | `xm3600_google_translate.csv`                  |
 
 ---
 
 ## 🧠 Pretrained Models
 
-The distilled Nep-CLIP models are available for public use. 
-> 🔗 <a href="https://drive.google.com/drive/u/1/folders/1ZY_gS27NwRj5RoZFb-yCj9kh-i09WjCh?usp=sharing" target="_blank" rel="noopener noreferrer">**Download Nep-CLIP Models (Google Drive)**</a>
+The distilled Nep-CLIP checkpoints are publicly available.
+
+> 🔗 <a href="https://drive.google.com/drive/u/1/folders/1ZY_gS27NwRj5RoZFb-yCj9kh-i09WjCh?usp=sharing" target="_blank" rel="noopener noreferrer"><b>Download Nep-CLIP Models (Google Drive)</b></a>
 
 ---
-The following distilled checkpoint files are hosted in the Google Drive directory under the model artifacts section:
 
-### 1. `Nep-CLIP Model (RoBERTa based)`
-* **File Name:** RoBERTa_Nepali_110M distillation_epoch_4_step_150000.pt
-* **Description:** Pretrained PyTorch model checkpoint utilizing a 110M parameter Nepali RoBERTa architecture as the student text encoder. Aligned via knowledge distillation at Epoch 4, Step 150,000.
+### 1. Nep-CLIP (RoBERTa)
 
-### 2. `Nep-CLIP Model (BERT based)`
-* **File Name:** Shushant-nepaliBERT distillation_epoch_4_step_150000.pt
-* **Description:** Pretrained PyTorch model checkpoint utilizing the Shushant-nepaliBERT architecture as the student text encoder. Aligned via knowledge distillation at Epoch 4, Step 150,000.
+**Checkpoint**
+
+```
+RoBERTa_Nepali_110M_distillation_epoch_4_step_150000.pt
+```
+
+**Description**
+
+A distilled Nep-CLIP model using a 110M parameter Nepali RoBERTa encoder trained through knowledge distillation.
+
+---
+
+### 2. Nep-CLIP (BERT)
+
+**Checkpoint**
+
+```
+Shushant-nepaliBERT_distillation_epoch_4_step_150000.pt
+```
+
+**Description**
+
+A distilled Nep-CLIP model using the Shushant NepaliBERT encoder trained through knowledge distillation.
 
 ---
 
 ## 📋 Evaluated Models
 
-The following models were evaluated for image-text retrieval and zero-shot classification:
+The following models were evaluated for image-text retrieval:
 
-- **BERT** (Shushant-nepaliBERT student encoder)
-- **RoBERTa** (Nepali RoBERTa student encoder)
-- **NLLB**
-- **MCLIP**
-- **CLIP (English)**
-- **CLIP (Nepali input)**
-
----
-# 🛠️ Setup and Installation Guide
-
-Follow these steps to set up the development environment and reproduce the evaluation results.
+* Nep-CLIP (RoBERTa)
+* Nep-CLIP (BERT)
+* NLLB-CLIP
+* M-CLIP
+* CLIP-English
+* CLIP-English (Nepali Input)
 
 ---
+# 📈 Benchmark Results
+
+This section summarizes the performance of **Nep-CLIP** across multiple downstream evaluation tasks.
+
+> All benchmark evaluations were conducted on **Google Colab (NVIDIA L4 GPU)**.
+
+---
+
+## Image-Text Retrieval
+The following figure summarizes the image-text retrieval performance of Nep-CLIP across all evaluation benchmarks (Flickr8k, Flickr30k, XTD10, and XM3600).
+
+<p>
+  <img src="assets/nepclip_image_retrieval_benchmark_results.png"
+       alt="Nep-CLIP Benchmark Results"
+       width="457">
+</p>
+
+**Figure:** Cross-modal retrieval performance on the Nepali datasets. **w/ PP** denotes models trained with preprocessing. **Bold** values indicate the best performance among the distilled and multilingual models, excluding the English upper-bound (CLIP-English*).
+
+## Zero-Shot Image Classification
+***Coming Soon***
+
+## 📌 Key Findings
+
+* 🥇 **Nep-CLIP (RoBERTa)** consistently achieves the best performance among Nepali models across all benchmarks.
+* 🥈 **Nep-CLIP (BERT)** provides competitive performance and closely follows the RoBERTa model.
+* 🌍 Both Nep-CLIP models significantly outperform multilingual baselines (**NLLB-CLIP** and **M-CLIP**) on Nepali image-text retrieval.
+* 📈 **CLIP-English*** serves as the English upper-bound, while directly applying English CLIP to Nepali text without adaptation leads to near-zero retrieval performance.
+
+---
+
+# 🛠️ Setup and Installation
 
 ## Prerequisites
 
-- **Python 3.11** — verify with `python --version`
-- **Git** — to clone the repository
-- **pip** — comes bundled with Python 3.9+
+* Python 3.11
+* Git
+* pip
 
 ---
 
-## Step 2: Create and Activate a Virtual Environment
+## 1. Clone the Repository
 
-Create the environment using **Python 3.11** specifically.
-
-**Check if Python 3.11 is installed:**
 ```bash
-python3 --version
+git clone https://github.com/<username>/Nep-CLIP.git
+cd Nep-CLIP
 ```
 
-If this shows a version other than 3.11, follow the steps below to install Python 3.11 specifically.
+---
 
-**If not installed:**
+## 2. Create a Virtual Environment
 
-**Linux (Ubuntu/Debian)**
-```bash
-sudo apt update
-sudo apt install python3.11 python3.11-venv
-```
+### Linux / macOS
 
-**macOS (using Homebrew)**
-```bash
-brew install python@3.11
-```
-
-**Windows**
-Download the installer from the [official Python website](https://www.python.org/downloads/release/python-3110/) and run it. Make sure to check **"Add Python to PATH"** during installation.
-
-**Create and activate the virtual environment:**
-
-**Linux / macOS**
 ```bash
 python3.11 -m venv venv_nep_clip
 source venv_nep_clip/bin/activate
 ```
 
-**Windows**
+### Windows
+
 ```bash
 python3.11 -m venv venv_nep_clip
 venv_nep_clip\Scripts\activate
 ```
 
-> You should see `(venv_nep_clip)` in your terminal prompt once the environment is active.
-
 ---
 
-## Step 3: Install Dependencies
+## 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
+
 ---
-## Step 4: Download Required Datasets
+
+## 4. Download Evaluation Datasets
 
 ```bash
 python3 download_dataset.py [-d {flickr8k,flickr30k,xtd10,xm3600,all}]
 ```
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `-d` | `all` | Dataset to download |
+Examples:
 
-**Examples:**
 ```bash
-python3 download_dataset.py            # download all datasets
-python3 download_dataset.py -d flickr8k  # Flickr8k only
-python3 download_dataset.py -d xtd10     # XTD10 only
+python3 download_dataset.py
+python3 download_dataset.py -d flickr8k
+python3 download_dataset.py -d xtd10
 ```
 
-Ensure you have a stable internet connection and sufficient disk space before running.
+---
 
-## Step 5: Run Image Retrieval Evaluation
+## 5. Run Image Retrieval Evaluation
 
 ```bash
 python3 evaluate_image_retrieval.py
 ```
 
-Results will be printed to the console, depending on the script configuration.
+---
+
+## ⚠️ NLLB & M-CLIP Compatibility
+
+The repository installs:
+
+```text
+transformers==5.12.1
+```
+
+To evaluate **NLLB-CLIP** or **M-CLIP**, install:
+
+```bash
+pip uninstall transformers -y
+pip install transformers==4.38.2
+```
 
 ---
-> ⚠️ **Disclaimer (NLLB & MCLIP):** By default, `transformers==5.12.1` is installed. To use the NLLB and MCLIP models, you need `transformers==4.38.2` instead:
-> ```bash
-> pip uninstall transformers -y
-> pip install transformers==4.38.2
-> ```
-## Notes
 
-- Always activate the virtual environment before running any scripts.
-- If you update dependencies, re-run `pip install -r requirements.txt`.
-- To deactivate the virtual environment when done: `deactivate`
+## 📝 Notes
+
+* Activate the virtual environment before running scripts.
+* Reinstall dependencies after updating `requirements.txt`.
+* Exit the environment using:
+
+```bash
+deactivate
+```
+
+---
