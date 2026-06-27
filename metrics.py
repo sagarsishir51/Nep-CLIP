@@ -55,6 +55,8 @@ def compute_metrics(similarity, query_type='i2t', captions_per_image=5):
     I2T: Row-wise search (Is the correct caption in the top K for this image?)
     T2I: Column-wise search (Is the correct image in the top K for this caption?)
     """
+    if torch.is_tensor(similarity):
+        similarity = similarity.detach().cpu().numpy()
     aps, ars, af1s = [], [], []
     if query_type == 'i2t':
         # [N_images, N_texts] -> Axis 0 is images

@@ -27,7 +27,6 @@ def run_full_report(model_configs,image_values,text_inputs,eng_text_inputs, devi
             txt_emb = model.get_text_features(texts=text_inputs, batch_size=batch_size, device=device)
         # 3. Compute Similarity
         similarity = img_emb @ txt_emb.T
-
         # 4. Store metrics
         results[name] = {
             "txt_emb": txt_emb,

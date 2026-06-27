@@ -255,7 +255,7 @@ def preprocess_all_datasets(clip_processor):
             print(f"Preprocessing dataset {dataset_name}")
             print(f"test_images {len(test_images)}")
             print(f"test_captions {len(test_captions)}")
-            dataset = EvaluationDataset(image_paths=test_images, captions=test_captions,eng_captions=test_eng_captions, image_processor=clip_processor)
+            dataset = EvaluationDataset(image_paths=test_images, test_texts=test_captions,test_eng_texts=test_eng_captions, image_processor=clip_processor)
             image_values, text_inputs,eng_text_inputs = dataset.get_all_data()
             processed_datasets[dataset_name] = {
                 "image_values": image_values,

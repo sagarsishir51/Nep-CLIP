@@ -25,7 +25,7 @@ DISTILLED_MODELS_CONFIG = {
              "teacher_id": "openai/clip-vit-base-patch32",
             "file_name": "RoBERTa_Nepali_110M distillation_epoch_4_step_150000.pt"
         },
-    "NLLB":
+    "NLLB-CLIP":
         {
             "name": "NLLB",
             "id": "facebook/nllb-200-distilled-600M",
@@ -60,7 +60,7 @@ def get_all_models_with_loaded_instance(model_folder, device):
 
         if is_target_env:
             # ENVIRONMENT A (4.38.2): Load ONLY NLLB and MCLIP. Neglect all others.
-            if student_key == "NLLB":
+            if student_key == "NLLB-CLIP":
                 print(f"Correct version ({current_version}) confirmed. Loading NLLB...")
                 models_dict[student_key] = NLLB_Model(config=config)
             elif student_key == "MCLIP":
@@ -71,7 +71,7 @@ def get_all_models_with_loaded_instance(model_folder, device):
 
         else:
             # ENVIRONMENT B (Not 4.38.2): Neglect NLLB/MCLIP. Load everything else.
-            if student_key in ["NLLB", "MCLIP"]:
+            if student_key in ["NLLB-CLIP", "MCLIP"]:
                 print(f"Skipping {student_key}: Requires v{required_version} (Found v{current_version}).")
             elif student_key in ["CLIP-English", "CLIP (Nepali input)"]:
                 print(f"Loading {student_key} standard instance...")

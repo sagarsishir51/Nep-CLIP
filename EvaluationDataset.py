@@ -3,15 +3,20 @@ from torch.utils.data import Dataset
 import torch
 from tqdm import tqdm
 
+from template_mapper import TEMPLATES_NE, TEMPLATES_EN
+
+
 class EvaluationDataset(Dataset):
-    def __init__(self, image_paths, test_texts,test_eng_texts, image_processor):
+    def __init__(self, image_paths, test_texts,test_eng_texts, image_processor,use_templates=False):
         print(f"Pre-processing {len(image_paths)} images and {len(test_texts)} captions...")
 
         # 1. Pre-process Images with a Loading Bar
         processed_images = []
 
         for path in tqdm(image_paths, desc="Processing Images", unit="img"):
-            if not isinstance(path, torch.Tensor):
+            if isinstance(path, Image.Image):
+                img = path
+            elif not isinstance(path, torch.Tensor):
                 img = Image.open(path).convert("RGB")
             else:
                 img = path
@@ -19,8 +24,17 @@ class EvaluationDataset(Dataset):
             processed_images.append(encoding.pixel_values.squeeze(0))
 
         self.pixel_values = torch.stack(processed_images, dim=0)
-        self.texts = test_texts
-        self.eng_texts = test_eng_texts
+        self.texts = []
+        self.eng_texts = []
+        if use_templates:
+            print("Using Templates for Labels")
+            for test_text in test_texts:
+                self.texts.append([t.format(test_text) for t in TEMPLATES_NE])
+            for test_eng_text in test_eng_texts:
+                self.eng_texts.append([t.format(test_eng_text) for t in TEMPLATES_EN])
+        else:
+            self.texts = test_texts
+            self.eng_texts = test_eng_texts
         print("Dataset preparation complete!")
 
     def __len__(self):

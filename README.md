@@ -112,14 +112,22 @@ The following figure summarizes the image-text retrieval performance of Nep-CLIP
 
 <p>
   <img src="assets/nepclip_image_retrieval_benchmark_results.png"
-       alt="Nep-CLIP Benchmark Results"
+       alt="Nep-CLIP IR Benchmark Results"
        width="457">
 </p>
 
 **Figure:** Cross-modal retrieval performance on the Nepali datasets. **w/ PP** denotes models trained with preprocessing. **Bold** values indicate the best performance among the distilled and multilingual models, excluding the English upper-bound (CLIP-English*).
 
 ## Zero-Shot Image Classification
-***Coming Soon***
+The following figure summarizes the zero shot classification performance of Nep-CLIP across all evaluation benchmarks (Babel-ImageNet Nepali, CIFAR10, CIFAR100).
+
+<p>
+  <img src="assets/nepclip_zsc_benchmark_results.png"
+       alt="Nep-CLIP ZSC Benchmark Results"
+       width="1118">
+</p>
+
+**Figure:** Zero-shot classification performance on the Nepali image datasets across different benchmarks. Top-1 accuracy, Top-5 accuracy, MRR, and MAF1 are reported. **Bold** values indicate the best performance among the distilled and multilingual models, excluding the English upper-bound (CLIP-English*).
 
 ## 📌 Key Findings
 
