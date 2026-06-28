@@ -126,7 +126,6 @@ def download_flickr8k_dataset(num_threads=8):
             "extract_to": base_dir,
         },
     ]
-    download_karpathy_splits()
     for item in downloads:
         print(f"\n[{item['name']}]")
         if os.path.exists(item["check"]):
@@ -153,7 +152,6 @@ def download_flickr30k_dataset():
     token_file = f"{base_dir}/{file_name}"
 
     os.makedirs(base_dir, exist_ok=True)
-    download_karpathy_splits()
     print("\n[Images]")
     if not os.path.exists(images_extract_dir):
         print("  Downloading Flickr30k images from HuggingFace...")
@@ -425,10 +423,12 @@ if __name__ == "__main__":
     # Route execution based on command line choices
     if args.dataset in ["flickr8k", "all"]:
         print("=== Starting Flickr8k Download ===")
+        download_karpathy_splits()
         download_flickr8k_dataset(num_threads=args.threads)
 
     if args.dataset in ["flickr30k", "all"]:
         print("\n=== Starting Flickr30k Download ===")
+        download_karpathy_splits()
         download_flickr30k_dataset()
 
     if args.dataset in ["xtd10", "all"]:

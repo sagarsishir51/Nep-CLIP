@@ -15,23 +15,29 @@ TEACHER_ID = "openai/clip-vit-base-patch32"
 BATCH_SIZE = 256
 
 
-def run_full_report(model_configs,image_values,text_inputs,eng_text_inputs,gt_labels, device, batch_size,top_k=5):
+def run_full_report(model_configs,image_values,text_inputs,eng_text_inputs,gt_labels,gt_labels_en, device, batch_size,top_k=5):
     results = {}
 
     for name, model in model_configs.items():
         img_emb = model.get_image_features(image_values=image_values, batch_size=batch_size, device=device)
         if name == "CLIP-English":
             txt_emb = model.get_text_features(texts=eng_text_inputs, batch_size=batch_size, device = device)
+            results[name] = compute_zsc_metrics(
+                img_f=img_emb,
+                txt_f=txt_emb,
+                gt_labels=gt_labels_en if len(gt_labels_en) > 0 else gt_labels,
+                top_k=top_k,
+                device=device,
+            )
         else:
             txt_emb = model.get_text_features(texts=text_inputs, batch_size=batch_size, device=device)
-
-        results[name]  = compute_zsc_metrics(
-            img_f=img_emb,
-            txt_f=txt_emb,
-            gt_labels=gt_labels,
-            top_k=top_k,
-            device=device,
-        )
+            results[name] = compute_zsc_metrics(
+                img_f=img_emb,
+                txt_f=txt_emb,
+                gt_labels=gt_labels,
+                top_k=top_k,
+                device=device,
+            )
 
         # Memory management
         torch.cuda.empty_cache()
@@ -51,6 +57,7 @@ if __name__ == "__main__":
         text_inputs = data["text_inputs"]
         eng_text_inputs = data["eng_text_inputs"]
         gt_labels = data["gt_labels"]
+        gt_labels_en = data["gt_labels_en"]
         complete_reports = run_full_report(
             model_configs=model_configs,
             image_values=image_values,
@@ -59,5 +66,6 @@ if __name__ == "__main__":
             device=DEVICE,
             batch_size=BATCH_SIZE,
             gt_labels=gt_labels,
+            gt_labels_en=gt_labels_en,
         )
         log_zsc_report(complete_reports["results"])
