@@ -196,28 +196,104 @@ python3 download_dataset.py
 python3 download_dataset.py -d flickr8k
 python3 download_dataset.py -d xtd10
 ```
+
 > **Note**
-> - The script automatically downloads and prepares the supported evaluation datasets listed above.
-> - **ImageNet** is **not** downloaded automatically due to its licensing and access restrictions. To evaluate on ImageNet, download the following files from **ImageNet Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)**:
->   - **Development kit (Task 1 & 2)**
->   - **Validation images (all tasks)**
-> - Download them from the official ImageNet website: https://www.image-net.org/download.php
-> - After downloading, extract and place them in the following directory structure:
+>
+> * The script automatically downloads and prepares the following evaluation datasets inside the `dataset/` directory:
+>
+>   * `flickr8k`
+>   * `flickr30k`
+>   * `xtd10`
+>   * `xm3600`
+>   * `cifar10`
+>   * `cifar100`
+>
+>   The resulting directory structure is:
+>
+>   ```text
+>   dataset/
+>   ├── flickr8k/
+>   ├── flickr30k/
+>   ├── xtd10/
+>   ├── xm3600/
+>   ├── cifar10/
+>   └── cifar100/
+>   ```
+>
+> * **ImageNet** is **not** downloaded automatically due to its licensing and access restrictions. To evaluate on **ImageNet Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)**, manually download the following from the official ImageNet website:
+>
+>   * **Development kit (Task 1 & 2)**
+>   * **Validation images (all tasks)**
+>
+>   https://www.image-net.org/download.php
+>
+> * After downloading, extract and place them in the following directory structure:
+>
+>   ```text
+>   dataset/
+>   └── imagenet/
+>       ├── ILSVRC2012_devkit_t12/
+>       └── ILSVRC2012_img_val/
+>   ```
+>
+>   Ensure the folder names match exactly as shown above.
+
+## 5. Download Nep-CLIP Datasets
+
+Download the processed **Nep-CLIP** datasets from the link below.
+
+The processed Nepali image-text pairs are publicly available.
+
+> 🔗 <a href="https://drive.google.com/drive/folders/1kovgPWgzIfNO_Cv64rGTgCTBQDelE8k2?usp=sharing" target="_blank" rel="noopener noreferrer"><b>Download Nep-CLIP Datasets (Google Drive)</b></a>
+
+> **Note**
+>
+> * After downloading, place the datasets in the following directory:
 >
 > ```text
-> dataset/
-> └── imagenet/
->     ├── ILSVRC2012_devkit_t12/
->     └── ILSVRC2012_img_val/
+> Nep_CLIP_Datasets/
+> ├── CC3M_Captions/
+> ├── Training_Data/
+> ├── Validation_Data/
+> ├── flickr8k_nepali_output_google_translate.csv
+> ├── flickr30k_nepali_output_google_translate.csv
+> ├── xtd10_google_translate.csv
+> ├── xm3600_google_translate.csv
+> ├── ...
 > ```
 >
-> Ensure the folder names match exactly as shown above.
-## 5. Run Image Retrieval Evaluation
+> Ensure the directory structure is preserved after extraction.
+>
+> * Refer to the **Datasets** section for details on about the datasets.
+
+## 6. Download Pretrained Models
+
+Download the pretrained **Nep-CLIP** checkpoints from the link below.
+
+The distilled Nep-CLIP checkpoints are publicly available.
+
+> 🔗 <a href="https://drive.google.com/drive/u/1/folders/1ZY_gS27NwRj5RoZFb-yCj9kh-i09WjCh?usp=sharing" target="_blank" rel="noopener noreferrer"><b>Download Nep-CLIP Models (Google Drive)</b></a>
+
+> **Note**
+>
+> * After downloading, place the checkpoints in the following directory:
+>
+> ```text
+> Nep_CLIP_Models/
+> ├── RoBERTa_Nepali_110M_distillation_epoch_4_step_150000.pt
+> └── Shushant-nepaliBERT_distillation_epoch_4_step_150000.pt
+> ```
+>
+> Ensure the checkpoint filenames match exactly as shown above.
+>
+> * Refer to the **Pretrained Models** section for details on the pretrained checkpoints.
+
+## 7. Run Image Retrieval Evaluation
 
 ```bash
 python3 evaluate_image_retrieval.py
 ```
-## 5. Run Zero-Shot Image Classification
+## 8. Run Zero-Shot Image Classification
 
 ```bash
 python3 evaluate_zsc.py
