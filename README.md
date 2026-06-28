@@ -186,7 +186,7 @@ pip install -r requirements.txt
 ## 4. Download Evaluation Datasets
 
 ```bash
-python3 download_dataset.py [-d {flickr8k,flickr30k,xtd10,xm3600,all}]
+python3 download_dataset.py [-d {flickr8k,flickr30k,xtd10,xm3600,cifar10,cifar100,all}]
 ```
 
 Examples:
@@ -196,9 +196,22 @@ python3 download_dataset.py
 python3 download_dataset.py -d flickr8k
 python3 download_dataset.py -d xtd10
 ```
-
----
-
+> **Note**
+> - The script automatically downloads and prepares the supported evaluation datasets listed above.
+> - **ImageNet** is **not** downloaded automatically due to its licensing and access restrictions. To evaluate on ImageNet, download the following files from **ImageNet Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)**:
+>   - **Development kit (Task 1 & 2)**
+>   - **Validation images (all tasks)**
+> - Download them from the official ImageNet website: https://www.image-net.org/download.php
+> - After downloading, extract and place them in the following directory structure:
+>
+> ```text
+> dataset/
+> └── imagenet/
+>     ├── ILSVRC2012_devkit_t12/
+>     └── ILSVRC2012_img_val/
+> ```
+>
+> Ensure the folder names match exactly as shown above.
 ## 5. Run Image Retrieval Evaluation
 
 ```bash
