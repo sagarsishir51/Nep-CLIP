@@ -3,6 +3,7 @@ from transformers import AutoTokenizer, CLIPProcessor,CLIPModel
 import torch
 from tqdm import tqdm
 from model.NepClipEncoder import NepClipEncoder
+import torch.nn.functional as F
 
 
 class NepClip_Model:
@@ -53,12 +54,33 @@ class NepClip_Model:
         return nep_clip_encoder
 
     def get_text_features(self, texts, batch_size, device):
-        # --- 2. Loop through each Nepali Text Encoder ---
-        self.nep_clip_encoder.to(device).eval()
-        txt_embs = []
+        """
+        Encodes text with nep_clip_encoder. Supports two input shapes:
 
+          - Flat list of strings:
+              ["text1", "text2", ...] -> returns (N_texts, D)
+
+          - Nested list (per-class templates, for ensembling):
+              [["a photo of dog", "a sketch of dog", ...],   # class 0
+               ["a photo of cat", "a sketch of cat", ...]]   # class 1
+              -> averages + re-normalizes each group -> returns (N_classes, D)
+        """
+        self.nep_clip_encoder.to(device).eval()
+
+        # --- 1. Detect shape, flatten if nested ---
+        is_grouped = isinstance(texts[0], (list, tuple))
+
+        if is_grouped:
+            flat_texts, counts = [], []
+            for group in texts:
+                flat_texts.extend(group)
+                counts.append(len(group))
+        else:
+            flat_texts, counts = texts, None
+
+        # --- 2. Tokenize everything once ---
         tokenized_inputs = self.tokenizer(
-            texts,
+            flat_texts,
             padding="max_length",
             truncation=True,
             max_length=77,
@@ -66,14 +88,34 @@ class NepClip_Model:
         )
 
         num_texts = tokenized_inputs['input_ids'].shape[0]
+        all_embs = []
+
+        # --- 3. Encode in batch_size chunks regardless of grouping ---
         with torch.no_grad():
             for i in tqdm(range(0, num_texts, batch_size), desc=f"Encoding Text for {self.name}"):
                 batch_text = {k: v[i: i + batch_size].to(device) for k, v in tokenized_inputs.items()}
                 txt_f = self.nep_clip_encoder(batch_text)
-                txt_f = txt_f / txt_f.norm(dim=-1, keepdim=True)
-                txt_embs.append(txt_f.cpu())
+                txt_f = F.normalize(txt_f, p=2, dim=-1)
+                all_embs.append(txt_f.cpu())
 
-        return torch.cat(txt_embs, dim=0).numpy()  # [N_texts, D]
+        all_embs = torch.cat(all_embs, dim=0)  # (Total_texts, D)
+
+        # --- 4. Flat input: return embeddings directly ---
+        if not is_grouped:
+            return all_embs  # (N_texts, D)
+
+        # --- 5. Grouped input: average + re-normalize per class ---
+        if len(set(counts)) == 1:
+            n_templates, n_classes = counts[0], len(counts)
+            grouped = all_embs.view(n_classes, n_templates, -1)
+            class_embs = F.normalize(grouped.mean(dim=1), p=2, dim=-1)
+        else:
+            split_embs = torch.split(all_embs, counts, dim=0)
+            class_embs = torch.stack([
+                F.normalize(e.mean(dim=0), p=2, dim=0) for e in split_embs
+            ], dim=0)
+
+        return class_embs  # (N_classes, D)
 
     def get_image_features(self, image_values, batch_size=256, device="cuda"):
         img_embs = []
@@ -88,4 +130,4 @@ class NepClip_Model:
 
                 img_f = img_f / img_f.norm(dim=-1, keepdim=True)
                 img_embs.append(img_f.cpu())
-        return torch.cat(img_embs, dim=0).numpy()  # [N_images, D]
+        return torch.cat(img_embs, dim=0)  # [N_images, D]
