@@ -37,8 +37,8 @@ def get_test_images(file_path):
     return test_images_ids
 
 # DATASET_LIST = ["CIFAR10","CIFAR100","IMAGENET"]
-DATASET_LIST = ["CIFAR100"]
-# DATASET_LIST = ["XM3600"]
+DATASET_LIST = ["CIFAR10","CIFAR100"]
+# DATASET_LIST = ["CIFAR10"]
 
 
 def get_test_images_for_cifar100(image_path,xtd10_data):
@@ -120,35 +120,41 @@ def get_test_images_for_imagenet(image_path,xtd10_data):
 
 def preprocess_zsc_datasets(clip_processor):
     processed_datasets = {}
-    test_images = []
-    test_labels = []
-    gt_labels = []
-    test_eng_labels = []
     for dataset_name in DATASET_LIST:
+        test_images = []
+        test_labels = []
+        gt_labels = []
+        test_eng_labels = []
         if dataset_name == "CIFAR10":
-            test_labels = CIFAR10_LABELS_NE
-            test_eng_labels = CIFAR10_LABELS_EN
-            cifar10_dataset = torchvision.datasets.CIFAR10(root='dataset/cifar10', train=False, download=False)
-            gt_labels = cifar10_dataset.targets
-            for i in range(len(cifar10_dataset)):
-                img, _ = cifar10_dataset[i]
-                test_images.append(img)
+            try:
+                test_labels = CIFAR10_LABELS_NE
+                test_eng_labels = CIFAR10_LABELS_EN
+                cifar10_dataset = torchvision.datasets.CIFAR10(root='dataset/cifar10', train=False, download=False)
+                gt_labels = cifar10_dataset.targets
+                for i in range(len(cifar10_dataset)):
+                    img, _ = cifar10_dataset[i]
+                    test_images.append(img)
+            except RuntimeError:
+                print("CIFAR-10 dataset not found. First download dataset using script download_dataset.py")
+                continue
         elif dataset_name == "CIFAR100":
-            test_labels =CIFAR100_LABELS_NE
-            test_eng_labels = CIFAR100_LABELS_EN
-            cifar100_dataset = torchvision.datasets.CIFAR100(root='dataset/cifar100', train=False, download=False)
-            gt_labels = cifar100_dataset.targets
-            for i in range(len(cifar100_dataset)):
-                img, _ = cifar100_dataset[i]
-                test_images.append(img)
+            try:
+                test_labels =CIFAR100_LABELS_NE
+                test_eng_labels = CIFAR100_LABELS_EN
+                cifar100_dataset = torchvision.datasets.CIFAR100(root='dataset/cifar100', train=False, download=False)
+                gt_labels = cifar100_dataset.targets
+                for i in range(len(cifar100_dataset)):
+                    img, _ = cifar100_dataset[i]
+                    test_images.append(img)
+            except RuntimeError:
+                print("CIFAR-100 dataset not found. First download dataset using script download_dataset.py")
+                continue
         elif dataset_name == "ImageNet":
             image_path = "dataset/xtd10/"
         else:
             print(f"Dataset {dataset_name} not found.")
         if len(test_images)>0 and len(test_labels)>0 and len(gt_labels)>0:
             print(f"Preprocessing dataset {dataset_name}")
-            print(f"test_images {len(test_images)}")
-            print(f"test_captions {len(test_labels)}")
             dataset = EvaluationDataset(image_paths=test_images, test_texts=test_labels,test_eng_texts=test_eng_labels, image_processor=clip_processor,use_templates=True)
             image_values, text_inputs,eng_text_inputs = dataset.get_all_data()
             processed_datasets[dataset_name] = {

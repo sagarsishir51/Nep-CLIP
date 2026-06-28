@@ -140,11 +140,10 @@ def log_report(reports):
 
       print(f"{model:<30} | {i2t_str:<60} | {t2i_str:<60}")
 
-def compute_zsc_metrics(img_f, txt_f, gt_labels, temperature=0.05, top_k=5):
+def compute_zsc_metrics(img_f, txt_f, gt_labels, temperature=0.05, top_k=5,device="cpu"):
     """
     Enhanced metrics for ZSC, including Ranking and Class-Balanced stats.
     """
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     img_f, txt_f = img_f.to(device), txt_f.to(device)
     gt_tensor = torch.as_tensor(gt_labels).to(device)
 

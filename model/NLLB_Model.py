@@ -54,7 +54,7 @@ class NLLB_Model:
 
                 text_inputs = self.tokenizer(
                     batch_texts,
-                    padding="longest",
+                    padding=True,
                     truncation=True,
                     max_length=77,
                     return_tensors="pt",

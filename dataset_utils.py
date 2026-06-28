@@ -222,11 +222,11 @@ DATASET_LIST = ["FLICK8K"]
 
 def preprocess_all_datasets(clip_processor):
     processed_datasets = {}
-    test_images = []
-    test_captions = []
-    test_eng_captions = []
-    captions_per_image = 0
     for dataset_name in DATASET_LIST:
+        test_images = []
+        test_captions = []
+        test_eng_captions = []
+        captions_per_image = 0
         if dataset_name == "FLICK8K":
             translated_dataset = pd.read_csv(FLICK_8K_CSV_FILE_NAME)
             test_img_ids = get_test_images("dataset/karpathy/dataset_flickr8k.json")

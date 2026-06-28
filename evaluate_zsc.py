@@ -29,7 +29,8 @@ def run_full_report(model_configs,image_values,text_inputs,eng_text_inputs,gt_la
             img_f=img_emb,
             txt_f=txt_emb,
             gt_labels=gt_labels,
-            top_k=top_k
+            top_k=top_k,
+            device=device,
         )
 
         # Memory management
