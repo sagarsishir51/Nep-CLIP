@@ -217,7 +217,11 @@ python3 download_dataset.py -d xtd10
 ```bash
 python3 evaluate_image_retrieval.py
 ```
+## 5. Run Zero-Shot Image Classification
 
+```bash
+python3 evaluate_zsc.py
+```
 ---
 
 ## ⚠️ NLLB & M-CLIP Compatibility

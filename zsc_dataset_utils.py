@@ -96,7 +96,8 @@ def preprocess_zsc_datasets(clip_processor):
                 for i in range(len(cifar10_dataset)):
                     img, _ = cifar10_dataset[i]
                     test_images.append(img)
-            except RuntimeError:
+            except Exception as e:
+                print(e)
                 print("CIFAR-10 dataset not found. First download dataset using script download_dataset.py")
                 continue
         elif dataset_name == "CIFAR100":
@@ -108,7 +109,8 @@ def preprocess_zsc_datasets(clip_processor):
                 for i in range(len(cifar100_dataset)):
                     img, _ = cifar100_dataset[i]
                     test_images.append(img)
-            except RuntimeError:
+            except Exception as e:
+                print(e)
                 print("CIFAR-100 dataset not found. First download dataset using script download_dataset.py")
                 continue
         elif dataset_name == "IMAGENET":
@@ -122,7 +124,8 @@ def preprocess_zsc_datasets(clip_processor):
                 test_labels = mapped_data["text_inputs"]
                 test_eng_labels = mapped_data["eng_text_inputs"]
                 test_images = mapped_data["image_paths"]
-            except Exception:
+            except Exception as e:
+                print(e)
                 print("Imagenet dataset not found. First download dataset and configure it with the help of README file")
                 continue
         else:
