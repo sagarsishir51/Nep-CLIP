@@ -126,7 +126,6 @@ def download_flickr8k_dataset(num_threads=8):
             "extract_to": base_dir,
         },
     ]
-    download_karpathy_splits()
     for item in downloads:
         print(f"\n[{item['name']}]")
         if os.path.exists(item["check"]):
@@ -153,7 +152,6 @@ def download_flickr30k_dataset():
     token_file = f"{base_dir}/{file_name}"
 
     os.makedirs(base_dir, exist_ok=True)
-    download_karpathy_splits()
     print("\n[Images]")
     if not os.path.exists(images_extract_dir):
         print("  Downloading Flickr30k images from HuggingFace...")
@@ -342,6 +340,59 @@ def download_xm3600_dataset():
     except Exception as e:
         print(f"  ❌ Error downloading dataset: {e}")
 
+def download_cifar10_dataset():
+    """
+    Downloads the CIFAR-10 test split directly to the target folder using
+    torchvision's built-in dataset downloader.
+    """
+    print("\n[CIFAR-10 Raw Download]")
+    target_dir = "dataset/cifar10"
+    os.makedirs(target_dir, exist_ok=True)
+
+    # Check if files already exist to skip downloading
+    if os.path.exists(target_dir) and len(os.listdir(target_dir)) > 0:
+        print(f"  Dataset already exists in '{target_dir}'. Skipping.")
+        return
+
+    try:
+        print("  Downloading CIFAR-10 test split via torchvision...")
+
+        # download=True fetches and extracts cifar-10-python.tar.gz automatically
+        torchvision.datasets.CIFAR10(root=target_dir, train=False, download=True)
+
+        print(f"  ✅ Success! CIFAR-10 test split downloaded cleanly into: '{target_dir}'")
+        print("  Contents:", os.listdir(target_dir))
+
+    except Exception as e:
+        print(f"  ❌ Error downloading dataset: {e}")
+
+def download_cifar100_dataset():
+    """
+    Downloads the CIFAR-100 test split directly to the target folder using
+    torchvision's built-in dataset downloader.
+    """
+    print("\n[CIFAR-100 Raw Download]")
+    target_dir = "dataset/cifar100"
+    os.makedirs(target_dir, exist_ok=True)
+
+    # Check if files already exist to skip downloading
+    if os.path.exists(target_dir) and len(os.listdir(target_dir)) > 0:
+        print(f"  Dataset already exists in '{target_dir}'. Skipping.")
+        return
+
+    try:
+        print("  Downloading CIFAR-100 test split via torchvision...")
+
+        # download=True fetches and extracts cifar-10-python.tar.gz automatically
+        torchvision.datasets.CIFAR100(root=target_dir, train=False, download=True)
+
+        print(f"  ✅ Success! CIFAR-100 test split downloaded cleanly into: '{target_dir}'")
+        print("  Contents:", os.listdir(target_dir))
+
+    except Exception as e:
+        print(f"  ❌ Error downloading dataset: {e}")
+
+
 # --- Configuration & Execution Setup ---
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -354,7 +405,7 @@ if __name__ == "__main__":
         "--dataset",
         type=str,
         default="all",
-        choices=["flickr8k", "flickr30k","xtd10","xm3600","all"],
+        choices=["flickr8k", "flickr30k","xtd10","xm3600","cifar10","cifar100","all"],
         help="Specify which dataset to download (default: 'all').",
     )
 
@@ -372,10 +423,12 @@ if __name__ == "__main__":
     # Route execution based on command line choices
     if args.dataset in ["flickr8k", "all"]:
         print("=== Starting Flickr8k Download ===")
+        download_karpathy_splits()
         download_flickr8k_dataset(num_threads=args.threads)
 
     if args.dataset in ["flickr30k", "all"]:
         print("\n=== Starting Flickr30k Download ===")
+        download_karpathy_splits()
         download_flickr30k_dataset()
 
     if args.dataset in ["xtd10", "all"]:
@@ -385,3 +438,11 @@ if __name__ == "__main__":
     if args.dataset in ["xm3600", "all"]:
         print("\n=== Starting XTD10 Download ===")
         download_xm3600_dataset()
+
+    if args.dataset in ["cifar10", "all"]:
+        print("\n=== Starting CIFAR10 Download ===")
+        download_cifar10_dataset()
+
+    if args.dataset in ["cifar100", "all"]:
+        print("\n=== Starting CIFAR100 Download ===")
+        download_cifar100_dataset()

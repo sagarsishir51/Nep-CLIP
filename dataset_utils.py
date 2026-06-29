@@ -216,46 +216,65 @@ def get_test_images_for_xm3600(xm3600_data, image_path):
 
     return test_images_xm, test_captions_xm,test_eng_captions_xm
 
-# DATASET_LIST = ["FLICK8K","FLICK30K","XTD10","XM3600"]
-DATASET_LIST = ["FLICK8K"]
-# DATASET_LIST = ["XM3600"]
+DATASET_LIST = ["FLICK8K","FLICK30K","XTD10","XM3600"]
 
 def preprocess_all_datasets(clip_processor):
     processed_datasets = {}
-    test_images = []
-    test_captions = []
-    test_eng_captions = []
-    captions_per_image = 0
     for dataset_name in DATASET_LIST:
+        test_images = []
+        test_captions = []
+        test_eng_captions = []
+        captions_per_image = 0
         if dataset_name == "FLICK8K":
-            translated_dataset = pd.read_csv(FLICK_8K_CSV_FILE_NAME)
-            test_img_ids = get_test_images("dataset/karpathy/dataset_flickr8k.json")
-            image_path = "dataset/flickr8k/images/Flicker8k_Dataset/"
-            test_images,test_captions,test_eng_captions = get_test_images_for_flickr(test_img_ids=test_img_ids,image_path=image_path,flickr_dataset=translated_dataset)
-            captions_per_image = 5
+            try:
+                translated_dataset = pd.read_csv(FLICK_8K_CSV_FILE_NAME)
+                test_img_ids = get_test_images("dataset/karpathy/dataset_flickr8k.json")
+                image_path = "dataset/flickr8k/images/Flicker8k_Dataset/"
+                test_images,test_captions,test_eng_captions = get_test_images_for_flickr(test_img_ids=test_img_ids,image_path=image_path,flickr_dataset=translated_dataset)
+                captions_per_image = 5
+            except Exception as e:
+                print(e)
+                print("FLICK8K dataset not found. First download dataset using script download_dataset.py")
+                continue
+
         elif dataset_name == "FLICK30K":
-            translated_dataset = pd.read_csv(FLICK_30K_CSV_FILE_NAME)
-            test_img_ids = get_test_images("dataset/karpathy/dataset_flickr30k.json")
-            image_path = "dataset/flickr30k/images/"
-            test_images,test_captions,test_eng_captions = get_test_images_for_flickr(test_img_ids=test_img_ids,image_path=image_path,flickr_dataset=translated_dataset)
-            captions_per_image = 5
+            try:
+                translated_dataset = pd.read_csv(FLICK_30K_CSV_FILE_NAME)
+                test_img_ids = get_test_images("dataset/karpathy/dataset_flickr30k.json")
+                image_path = "dataset/flickr30k/images/"
+                test_images,test_captions,test_eng_captions = get_test_images_for_flickr(test_img_ids=test_img_ids,image_path=image_path,flickr_dataset=translated_dataset)
+                captions_per_image = 5
+            except Exception as e:
+                print(e)
+                print("FLICK30K dataset not found. First download dataset using script download_dataset.py")
+                continue
         elif dataset_name == "XTD10":
-            translated_dataset = pd.read_csv(XTD10_CSV_FILE_NAME)
-            image_path = "dataset/xtd10/"
-            test_images,test_captions,test_eng_captions = get_test_images_for_xtd10(image_path=image_path,xtd10_data=translated_dataset)
-            captions_per_image = 1
+            try:
+                translated_dataset = pd.read_csv(XTD10_CSV_FILE_NAME)
+                image_path = "dataset/xtd10/"
+                test_images,test_captions,test_eng_captions = get_test_images_for_xtd10(image_path=image_path,xtd10_data=translated_dataset)
+                captions_per_image = 1
+            except Exception as e:
+                print(e)
+                print("XTD10 dataset not found. First download dataset using script download_dataset.py")
+                continue
         elif dataset_name == "XM3600":
-            translated_dataset = pd.read_csv(XM3600_CSV_FILE_NAME)
-            image_path = "dataset/xm3600/images/"
-            test_images,test_captions,test_eng_captions = get_test_images_for_xm3600(xm3600_data=translated_dataset,image_path=image_path)
-            captions_per_image = 2
+            try:
+                translated_dataset = pd.read_csv(XM3600_CSV_FILE_NAME)
+                image_path = "dataset/xm3600/images/"
+                test_images,test_captions,test_eng_captions = get_test_images_for_xm3600(xm3600_data=translated_dataset,image_path=image_path)
+                captions_per_image = 2
+            except Exception as e:
+                print(e)
+                print("XM3600 dataset not found. First download dataset using script download_dataset.py")
+                continue
         else:
             print(f"Dataset {dataset_name} not found.")
         if len(test_images)>0 and len(test_captions)>0:
             print(f"Preprocessing dataset {dataset_name}")
             print(f"test_images {len(test_images)}")
             print(f"test_captions {len(test_captions)}")
-            dataset = EvaluationDataset(image_paths=test_images, captions=test_captions,eng_captions=test_eng_captions, image_processor=clip_processor)
+            dataset = EvaluationDataset(image_paths=test_images, test_texts=test_captions,test_eng_texts=test_eng_captions, image_processor=clip_processor)
             image_values, text_inputs,eng_text_inputs = dataset.get_all_data()
             processed_datasets[dataset_name] = {
                 "image_values": image_values,

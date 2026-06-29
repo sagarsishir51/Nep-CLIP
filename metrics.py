@@ -1,4 +1,7 @@
 import numpy as np
+import torch
+import torch.nn.functional as F
+from sklearn.metrics import f1_score
 
 def calculate_ap(found_ranks, total_relevant):
     """
@@ -52,6 +55,8 @@ def compute_metrics(similarity, query_type='i2t', captions_per_image=5):
     I2T: Row-wise search (Is the correct caption in the top K for this image?)
     T2I: Column-wise search (Is the correct image in the top K for this caption?)
     """
+    if torch.is_tensor(similarity):
+        similarity = similarity.detach().cpu().numpy()
     aps, ars, af1s = [], [], []
     if query_type == 'i2t':
         # [N_images, N_texts] -> Axis 0 is images
@@ -134,3 +139,94 @@ def log_report(reports):
                 f"{t2i['MAF1']:>5.2f} | {t2i['MRR@10']*100:>5.2f}")
 
       print(f"{model:<30} | {i2t_str:<60} | {t2i_str:<60}")
+
+def compute_zsc_metrics(img_f, txt_f, gt_labels, temperature=0.05, top_k=5,device="cpu"):
+    """
+    Enhanced metrics for ZSC, including Ranking and Class-Balanced stats.
+    """
+    img_f, txt_f = img_f.to(device), txt_f.to(device)
+    gt_tensor = torch.as_tensor(gt_labels).to(device)
+
+    # 1. Similarity & Probs
+    # Normalize features for true cosine similarity before logits
+    img_norm = F.normalize(img_f, p=2, dim=-1)
+    txt_norm = F.normalize(txt_f, p=2, dim=-1)
+
+    logits = (img_norm @ txt_norm.T) / temperature
+    probs = F.softmax(logits, dim=1)
+
+    # 2. Accuracy & Ranking
+    top_probs, top_indices = torch.topk(probs, k=min(top_k, txt_f.size(0)), dim=1)
+
+    # Top-1 and Top-K
+    top1_acc = (top_indices[:, 0] == gt_tensor).float().mean().item()
+    topk_acc = (top_indices == gt_tensor.view(-1, 1)).any(dim=1).float().mean().item()
+
+    # Mean Reciprocal Rank (MRR) - Crucial for large synset spaces
+    # Finds the rank of the ground truth label in the full sorted list
+    ranks = (logits.argsort(dim=1, descending=True) == gt_tensor.view(-1, 1)).nonzero(as_tuple=True)[1]
+    mrr = (1.0 / (ranks.float() + 1.0)).mean().item()
+
+    # 3. Macro Metrics (Class Balanced)
+    # Using CPU/Numpy for Sklearn metrics
+    preds_cpu = top_indices[:, 0].cpu().numpy()
+    gt_cpu = gt_tensor.cpu().numpy()
+
+    macro_f1 = f1_score(gt_cpu, preds_cpu, average='macro', zero_division=0)
+
+    # 4. Embedding Stats (The "Health Check")
+    # Inter-class similarity: Are your Nepali labels too crowded in vector space?
+    class_sim_matrix = txt_norm @ txt_norm.T
+    mask = torch.eye(class_sim_matrix.size(0), device=device).bool()
+    inter_class_sim = class_sim_matrix[~mask].mean().item()
+
+    return {
+        "top1_accuracy": top1_acc,
+        "topk_accuracy": topk_acc,
+        "mrr": mrr,
+        "macro_f1": macro_f1,
+        "stats": {
+            "avg_inter_class_similarity": inter_class_sim,
+            "max_logit": logits.max().item(),
+            "avg_confidence": top_probs[:, 0].mean().item(),
+            "theoretical_max_sim": class_sim_matrix.max().item()
+        }
+    }
+
+def log_zsc_report(all_metrics):
+    """
+    Enhanced ZSC report including MRR and Macro F1 for class-balanced evaluation.
+    """
+    # Expanded Header for better detail
+    header = (f"{'Model Checkpoint':<35} | "
+              f"{'Performance (Top1 | Top5 | MRR | F1)':<45} | "
+              f"{'Health (Sim | Conf | MaxL)':<35}")
+
+    print("\n" + "=" * len(header))
+    print(header)
+    print("-" * len(header))
+
+    # Sort models by numeric value in their filename (assuming get_numeric_step exists)
+    try:
+        sorted_models = sorted(all_metrics.items(), key=lambda x: get_numeric_step(x[0]))
+    except NameError:
+        sorted_models = sorted(all_metrics.items())
+
+    for model_name, metrics in sorted_models:
+        stats = metrics['stats']
+
+        # 1. Performance Metrics (Accuracies + Ranking + Balance)
+        # Note: Multiplying by 100 for percentage view
+        perf_str = (f"{metrics['top1_accuracy']*100:>5.2f}% | "
+                    f"{metrics['topk_accuracy']*100:>5.2f}% | "
+                    f"{metrics.get('mrr', 0.0)*100:>5.2f} | "
+                    f"{metrics.get('macro_f1', 0.0)*100:>5.2f}")
+
+        # 2. Embedding Health Stats
+        health_str = (f"Sim: {stats['avg_inter_class_similarity']:>5.3f} | "
+                      f"Conf: {stats['avg_confidence']:>5.3f} | "
+                      f"MaxL: {stats['max_logit']:>6.2f}")
+
+        print(f"{model_name:<35} | {perf_str:<45} | {health_str:<35}")
+
+    print("=" * len(header) + "\n")
