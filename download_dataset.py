@@ -13,6 +13,7 @@ from tqdm import tqdm
 import torchvision
 from dotenv import load_dotenv
 from huggingface_hub import snapshot_download
+from datasets import load_dataset
 
 load_dotenv()
 def download_chunk(url, start, end, chunk_id, tmp_dir, pbar, lock):
@@ -392,6 +393,34 @@ def download_cifar100_dataset():
     except Exception as e:
         print(f"  ❌ Error downloading dataset: {e}")
 
+def download_cvqa_dataset():
+    """
+    Downloads the CVQA dataset split directly to the target folder using
+    Hugging Face's datasets downloader.
+    """
+    print("\n[CVQA Raw Download]")
+    target_dir = "dataset/cvqa"
+    os.makedirs(target_dir, exist_ok=True)
+
+    # Check if files already exist to skip downloading
+    if os.path.exists(target_dir) and len(os.listdir(target_dir)) > 0:
+        print(f"  Dataset already exists in '{target_dir}'. Skipping.")
+        return
+
+    try:
+        print("  Downloading CVQA dataset via Hugging Face datasets...")
+
+        # Downloads the dataset and caches/saves it to the specified directory
+        # You can adjust the split (e.g., 'train', 'test', 'validation') as needed
+        REPO = "afaji/cvqa"
+        dataset = load_dataset(REPO, split="test", cache_dir=target_dir)
+
+        print(f"  ✅ Success! CVQA dataset downloaded cleanly into: '{target_dir}'")
+        print("  Contents:", os.listdir(target_dir))
+        return dataset
+
+    except Exception as e:
+        print(f"  ❌ Error downloading dataset: {e}")
 
 # --- Configuration & Execution Setup ---
 if __name__ == "__main__":
@@ -405,7 +434,7 @@ if __name__ == "__main__":
         "--dataset",
         type=str,
         default="all",
-        choices=["flickr8k", "flickr30k","xtd10","xm3600","cifar10","cifar100","all"],
+        choices=["flickr8k", "flickr30k","xtd10","xm3600","cifar10","cifar100","cvqa","all"],
         help="Specify which dataset to download (default: 'all').",
     )
 
@@ -446,3 +475,7 @@ if __name__ == "__main__":
     if args.dataset in ["cifar100", "all"]:
         print("\n=== Starting CIFAR100 Download ===")
         download_cifar100_dataset()
+
+    if args.dataset in ["cvqa"]:
+        print("\n=== Starting CVQA Download ===")
+        download_cvqa_dataset()

@@ -6,3 +6,4 @@ python-dotenv
 multilingual-clip
 scikit-learn
 torchvision
+datasets

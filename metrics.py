@@ -230,3 +230,33 @@ def log_zsc_report(all_metrics):
         print(f"{model_name:<35} | {perf_str:<45} | {health_str:<35}")
 
     print("=" * len(header) + "\n")
+
+
+def log_vqa_report(all_metrics):
+    """
+    Streamlined ZSC report displaying accuracy and record matches.
+    """
+    # Clean, focused header
+    header = (f"{'Model Checkpoint':<35} | "
+              f"{'Accuracy':<12} | "
+              f"{'Correct / Total Records':<25}")
+
+    print("\n" + "=" * len(header))
+    print(header)
+    print("-" * len(header))
+
+    # Sort models by numeric value in their filename if possible
+    try:
+        sorted_models = sorted(all_metrics.items(), key=lambda x: get_numeric_step(x[0]))
+    except NameError:
+        sorted_models = sorted(all_metrics.items())
+
+    for model_name, metrics in sorted_models:
+        # Extract fields from your exact result format
+        accuracy = metrics.get('accuracy_percentage', 0.0)
+        num_correct = metrics.get('num_correct', 0)
+        total_records = metrics.get('total_records', 0)
+
+        print(f"{model_name:<35} | {accuracy:>9.2f}% | {num_correct:>9} / {total_records:<13}")
+
+    print("=" * len(header) + "\n")
