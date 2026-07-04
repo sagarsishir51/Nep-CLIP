@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 LOCAL_MODEL_PATH = "Nep_CLIP_Models"
-TEACHER_ID = "openai/clip-vit-base-patch32"
+TEACHER_ID = "openai/clip-vit-large-patch14-336"
 BATCH_SIZE = 256
 
 def predict_best_option(similarity):
