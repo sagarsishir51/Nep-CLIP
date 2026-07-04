@@ -91,12 +91,14 @@ def preprocess_vqa_datasets(clip_processor):
                 cvqa_translated_data_map = load_cvqa_translated_dataset()
                 # cvqa_data = cvqa_data.select(range(100))
                 dataset = VQAEvaluationDataset(dataset=cvqa_data, dataset_translated_map = cvqa_translated_data_map, image_processor=clip_processor)
-                image_values, text_inputs, eng_text_inputs,labels = dataset.get_all_data()
+                image_values, text_inputs, eng_text_inputs,labels,subsets,categories = dataset.get_all_data()
                 processed_datasets[dataset_name] = {
                     "image_values": image_values,
                     "text_inputs": text_inputs,
                     "eng_text_inputs": eng_text_inputs,
-                    "labels": labels
+                    "labels": labels,
+                    "subsets": subsets,
+                    "categories": categories
                 }
                 # processed_datasets[dataset_name] = dataset
 

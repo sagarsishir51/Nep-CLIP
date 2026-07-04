@@ -1,8 +1,10 @@
+from collections import defaultdict
+
 import pandas as pd
 from transformers import CLIPProcessor, CLIPModel, AutoTokenizer, AutoModel
 import torch
 from tqdm import tqdm
-
+import numpy as np
 from load_model import get_all_models_with_loaded_instance
 from dataset_utils import get_device
 from metrics import log_vqa_report
@@ -127,6 +129,8 @@ def run_full_report(model_configs,dataset, device, batch_size):
         text_inputs = dataset["text_inputs"]
         eng_text_inputs = dataset["eng_text_inputs"]
         labels = dataset["labels"]
+        subsets = dataset["subsets"]
+        categories = dataset["categories"]
 
         img_emb = model.get_image_features(image_values=image_values, batch_size=batch_size, device=device)
         if name == "CLIP-English":
@@ -137,12 +141,54 @@ def run_full_report(model_configs,dataset, device, batch_size):
         similarity = torch.mm(img_emb, txt_emb.t())
         num_images, total_texts = similarity.shape
         pred_indices, confidences, all_option_scores = process_dynamic_similarity(similarity_matrix=similarity)
-        num_correct = sum(1 for pred, label in zip(pred_indices, labels) if pred == label)
-        accuracy = (num_correct / num_images) * 100
+
+        subset_counts = defaultdict(int)
+        subset_correct = defaultdict(int)
+        category_counts = defaultdict(int)
+        category_correct = defaultdict(int)
+
+        # Count correct predictions per group
+        for pred, label, subset, category in zip(pred_indices, labels, subsets, categories):
+            # Subset tracking
+            subset_counts[subset] += 1
+            if pred == label:
+                subset_correct[subset] += 1
+
+            # Category tracking
+            category_counts[category] += 1
+            if pred == label:
+                category_correct[category] += 1
+
+        # Calculate individual accuracies
+        subset_accuracies = {}
+        for subset in subset_counts:
+            subset_accuracies[subset] = (subset_correct[subset] / subset_counts[subset]) * 100
+
+        category_accuracies = {}
+        for cat in category_counts:
+            category_accuracies[cat] = (category_correct[cat] / category_counts[cat]) * 100
+
+        # Calculate Macro Accuracies
+        macro_accuracy_subsets = np.mean(list(subset_accuracies.values()))
+        macro_accuracy_categories = np.mean(list(category_accuracies.values()))
+
+        # Micro/Overall accuracy
+        overall_correct = sum(subset_correct.values())
+        overall_accuracy = (overall_correct / num_images) * 100
+
         results[name] = {
-            "num_correct": num_correct,
+            "num_correct": overall_correct,
             "total_records": num_images,
-            "accuracy_percentage": accuracy,
+            "overall_accuracy_percentage": overall_accuracy,
+
+            # Subset Data
+            "macro_accuracy_subsets": macro_accuracy_subsets,
+            "subset_accuracies": subset_accuracies,
+
+            # Category Data
+            "macro_accuracy_categories": macro_accuracy_categories,
+            "category_accuracies": category_accuracies,
+
             "predictions": pred_indices,
             "confidences": confidences,
             "all_scores": all_option_scores

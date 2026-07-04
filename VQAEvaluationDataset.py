@@ -12,6 +12,8 @@ class VQAEvaluationDataset(Dataset):
         self.texts = []
         self.eng_texts = []
         self.labels = []
+        self.subsets = []
+        self.categories = []
         processed_images = []
 
         for item in tqdm(dataset, desc="Processing Images", unit="img"):
@@ -34,7 +36,8 @@ class VQAEvaluationDataset(Dataset):
 
             english_question = item.get("Translated Question")
             english_options = item.get("Translated Options")
-
+            self.subsets.append(item.get("Subset"))
+            self.categories.append(item.get("Category"))
             self.eng_texts.extend([f"{english_question} {opt}" for opt in english_options])
 
         self.pixel_values = torch.stack(processed_images, dim=0)
@@ -46,4 +49,4 @@ class VQAEvaluationDataset(Dataset):
 
     def get_all_data(self):
         """Helper to get everything for run_report"""
-        return self.pixel_values,self.texts,self.eng_texts,self.labels
+        return self.pixel_values,self.texts,self.eng_texts,self.labels,self.subsets,self.categories
