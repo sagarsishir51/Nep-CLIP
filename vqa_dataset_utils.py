@@ -98,7 +98,6 @@ def preprocess_vqa_datasets(clip_processor):
                     "eng_text_inputs": eng_text_inputs,
                     "labels": labels
                 }
-                # processed_datasets[dataset_name] = dataset
 
             except Exception as e:
                 print(e)

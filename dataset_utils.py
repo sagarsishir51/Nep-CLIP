@@ -20,6 +20,7 @@ def get_device():
         device = torch.device("mps")
     else:
         device = torch.device("cpu")
+    print("DEVICE: ", device)
     return device
 
 def load_split(file_path):

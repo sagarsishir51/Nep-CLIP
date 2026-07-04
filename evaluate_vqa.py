@@ -1,3 +1,5 @@
+import argparse
+
 import pandas as pd
 from transformers import CLIPProcessor, CLIPModel, AutoTokenizer, AutoModel
 import torch
@@ -154,6 +156,16 @@ def run_full_report(model_configs,dataset, device, batch_size):
     }
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Run VQA Process for CLIP Models")
+
+    parser.add_argument(
+        "--batch_size",
+        type=int,
+        default=BATCH_SIZE,
+        help="Batch size for running the report (default: 256)"
+    )
+    args = parser.parse_args()
+
     DEVICE = get_device()
     clip_processor = CLIPProcessor.from_pretrained(TEACHER_ID)
     print("============================================= VQA Process for CLIP Model started =============================================")
@@ -166,6 +178,6 @@ if __name__ == "__main__":
             model_configs=model_configs,
             dataset=data,
             device=DEVICE,
-            batch_size=BATCH_SIZE,
+            batch_size=args.batch_size,
         )
         log_vqa_report(result["results"])
