@@ -422,6 +422,35 @@ def download_cvqa_dataset():
     except Exception as e:
         print(f"  ❌ Error downloading dataset: {e}")
 
+def download_alm_bench_dataset():
+    """
+    Downloads the MBZUAI/ALM-Bench dataset directly to the target folder using
+    Hugging Face's datasets downloader.
+    """
+    print("\n[ALM-Bench Raw Download]")
+    target_dir = "dataset/alm_bench"
+    os.makedirs(target_dir, exist_ok=True)
+
+    # Check if files already exist to skip downloading
+    if os.path.exists(target_dir) and len(os.listdir(target_dir)) > 0:
+        print(f"  Dataset already exists in '{target_dir}'. Skipping.")
+        return
+
+    try:
+        print("  Downloading MBZUAI/ALM-Bench dataset via Hugging Face datasets...")
+
+        # MBZUAI/ALM-Bench contains multilingual data (22k+ QA pairs).
+        # We target the main repository branch.
+        REPO = "MBZUAI/ALM-Bench"
+        dataset = load_dataset(REPO, cache_dir=target_dir)
+
+        print(f"  ✅ Success! ALM-Bench dataset downloaded cleanly into: '{target_dir}'")
+        print("  Contents:", os.listdir(target_dir))
+        return dataset
+
+    except Exception as e:
+        print(f"  ❌ Error downloading dataset: {e}")
+
 # --- Configuration & Execution Setup ---
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -434,7 +463,7 @@ if __name__ == "__main__":
         "--dataset",
         type=str,
         default="all",
-        choices=["flickr8k", "flickr30k","xtd10","xm3600","cifar10","cifar100","cvqa","all"],
+        choices=["flickr8k", "flickr30k","xtd10","xm3600","cifar10","cifar100","cvqa","alm","all"],
         help="Specify which dataset to download (default: 'all').",
     )
 
@@ -479,3 +508,7 @@ if __name__ == "__main__":
     if args.dataset in ["cvqa"]:
         print("\n=== Starting CVQA Download ===")
         download_cvqa_dataset()
+
+    if args.dataset in ["alm"]:
+        print("\n=== Starting ALM Download ===")
+        download_alm_bench_dataset()
