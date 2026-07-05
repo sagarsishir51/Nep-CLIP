@@ -2,7 +2,7 @@ from PIL import Image
 from torch.utils.data import Dataset
 import torch
 from tqdm import tqdm
-
+import ast
 
 class VQAEvaluationDataset(Dataset):
     def __init__(self, dataset_translated_map, dataset, image_processor):
@@ -11,8 +11,9 @@ class VQAEvaluationDataset(Dataset):
         """
         self.texts = []
         self.eng_texts = []
+        self.location_aware_eng_texts = []
         self.labels = []
-        self.subsets = []
+        self.locations = []
         self.categories = []
         processed_images = []
 
@@ -36,9 +37,13 @@ class VQAEvaluationDataset(Dataset):
 
             english_question = item.get("Translated Question")
             english_options = item.get("Translated Options")
-            self.subsets.append(item.get("Subset"))
+            subset = item.get("Subset")
+            subset_tuple = ast.literal_eval(subset)
+            self.locations.append(subset_tuple[1])
             self.categories.append(item.get("Category"))
-            self.eng_texts.extend([f"{english_question} {opt}" for opt in english_options])
+            # self.eng_texts.extend([f"{english_question} {opt}" for opt in english_options])
+            self.eng_texts.extend([f"Question: {english_question} Options: {opt} Short Answer:" for opt in english_options])
+            self.location_aware_eng_texts.extend([f"Location: {subset_tuple[1]}. Question: {english_question} Options: {opt} Short Answer:" for opt in english_options])
 
         self.pixel_values = torch.stack(processed_images, dim=0)
 
@@ -49,4 +54,4 @@ class VQAEvaluationDataset(Dataset):
 
     def get_all_data(self):
         """Helper to get everything for run_report"""
-        return self.pixel_values,self.texts,self.eng_texts,self.labels,self.subsets,self.categories
+        return self.pixel_values,self.texts,self.eng_texts,self.location_aware_eng_texts,self.labels,self.locations,self.categories

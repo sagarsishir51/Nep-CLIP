@@ -119,7 +119,7 @@ def run_full_report_old(model_configs,dataset, device, batch_size):
         torch.cuda.empty_cache()
 
 
-def run_full_report(model_configs,dataset, device, batch_size):
+def run_full_report(model_configs, dataset, device, batch_size):
     # 1. Get Image Embeddings once
     results = {}
 
@@ -128,52 +128,64 @@ def run_full_report(model_configs,dataset, device, batch_size):
         image_values = dataset["image_values"]
         text_inputs = dataset["text_inputs"]
         eng_text_inputs = dataset["eng_text_inputs"]
+        location_aware_eng_text_inputs = dataset["location_aware_eng_text_inputs"]
         labels = dataset["labels"]
-        subsets = dataset["subsets"]
+        locations = dataset["locations"]
         categories = dataset["categories"]
 
         img_emb = model.get_image_features(image_values=image_values, batch_size=batch_size, device=device)
+
         if name == "CLIP-English":
-            txt_emb = model.get_text_features(texts=eng_text_inputs, batch_size=batch_size, device = device)
+            txt_emb = model.get_text_features(texts=eng_text_inputs, batch_size=batch_size, device=device)
+            location_specific_txt_emb = model.get_text_features(texts=location_aware_eng_text_inputs,
+                                                                batch_size=batch_size, device=device)
         else:
             txt_emb = model.get_text_features(texts=text_inputs, batch_size=batch_size, device=device)
-        # 3. Compute Similarity
-        similarity = torch.mm(img_emb, txt_emb.t())
-        num_images, total_texts = similarity.shape
-        pred_indices, confidences, all_option_scores = process_dynamic_similarity(similarity_matrix=similarity)
+            # Assuming non-English models use standard text or handles location embedding similarly if provided
+            location_specific_txt_emb = model.get_text_features(texts=text_inputs, batch_size=batch_size, device=device)
 
-        subset_counts = defaultdict(int)
-        subset_correct = defaultdict(int)
+        # 3. Compute Similarity Matrices
+        similarity = torch.mm(img_emb, txt_emb.t())
+        location_specific_similarity = torch.mm(img_emb, location_specific_txt_emb.t())
+        num_images, total_texts = similarity.shape
+
+        # Process predictions for both standard and location-specific similarities
+        pred_indices, confidences, all_option_scores = process_dynamic_similarity(similarity_matrix=similarity)
+        loc_pred_indices, _, _ = process_dynamic_similarity(similarity_matrix=location_specific_similarity)
+
+        location_counts = defaultdict(int)
+        location_correct = defaultdict(int)
         category_counts = defaultdict(int)
         category_correct = defaultdict(int)
 
         # Count correct predictions per group
-        for pred, label, subset, category in zip(pred_indices, labels, subsets, categories):
-            # Subset tracking
-            subset_counts[subset] += 1
-            if pred == label:
-                subset_correct[subset] += 1
+        for pred, loc_pred, label, location, category in zip(pred_indices, loc_pred_indices, labels, locations,
+                                                             categories):
+            # Location tracking (Uses location_specific_similarity predictions)
+            location_counts[location] += 1
+            if loc_pred == label:
+                location_correct[location] += 1
 
-            # Category tracking
+            # Category tracking (Uses standard similarity predictions)
             category_counts[category] += 1
             if pred == label:
                 category_correct[category] += 1
 
         # Calculate individual accuracies
-        subset_accuracies = {}
-        for subset in subset_counts:
-            subset_accuracies[subset] = (subset_correct[subset] / subset_counts[subset]) * 100
+        location_accuracies = {}
+        for location in location_counts:
+            location_accuracies[location] = (location_correct[location] / location_counts[location]) * 100
 
         category_accuracies = {}
         for cat in category_counts:
             category_accuracies[cat] = (category_correct[cat] / category_counts[cat]) * 100
 
         # Calculate Macro Accuracies
-        macro_accuracy_subsets = np.mean(list(subset_accuracies.values()))
-        macro_accuracy_categories = np.mean(list(category_accuracies.values()))
+        macro_accuracy_locations = np.mean(list(location_accuracies.values())) if location_accuracies else 0.0
+        macro_accuracy_categories = np.mean(list(category_accuracies.values())) if category_accuracies else 0.0
 
-        # Micro/Overall accuracy
-        overall_correct = sum(subset_correct.values())
+        # Micro/Overall accuracy (Still based on standard text predictions)
+        overall_correct = sum(1 for p, l in zip(pred_indices, labels) if p == l)
         overall_accuracy = (overall_correct / num_images) * 100
 
         results[name] = {
@@ -181,20 +193,23 @@ def run_full_report(model_configs,dataset, device, batch_size):
             "total_records": num_images,
             "overall_accuracy_percentage": overall_accuracy,
 
-            # Subset Data
-            "macro_accuracy_subsets": macro_accuracy_subsets,
-            "subset_accuracies": subset_accuracies,
+            # Locations Data (Now location_specific driven)
+            "macro_accuracy_locations": macro_accuracy_locations,
+            "location_accuracies": location_accuracies,
 
             # Category Data
             "macro_accuracy_categories": macro_accuracy_categories,
             "category_accuracies": category_accuracies,
 
             "predictions": pred_indices,
+            "location_predictions": loc_pred_indices,
             "confidences": confidences,
             "all_scores": all_option_scores
         }
+
         # Memory management
         torch.cuda.empty_cache()
+
     return {
         "results": results,
     }
