@@ -10,6 +10,7 @@ from dataset_utils import get_device
 from metrics import log_vqa_report
 from vqa_dataset_utils import preprocess_vqa_datasets
 from dotenv import load_dotenv
+import argparse
 
 load_dotenv()
 LOCAL_MODEL_PATH = "Nep_CLIP_Models"
@@ -214,12 +215,31 @@ def run_full_report(model_configs, dataset, device, batch_size):
         "results": results,
     }
 
+
 if __name__ == "__main__":
+    # 1. Set up the argument parser
+    parser = argparse.ArgumentParser(description="Run VQA Process for CLIP Models.")
+
+    # 2. Add the batch_size argument (with a default value just in case)
+    parser.add_argument(
+        "--batch_size",
+        type=int,
+        default=BATCH_SIZE,
+        help="Batch size for running the full report (default: 32)"
+    )
+
+    # 3. Parse the arguments
+    args = parser.parse_args()
+
+    # Use args.batch_size in your script
     DEVICE = get_device()
     clip_processor = CLIPProcessor.from_pretrained(TEACHER_ID)
-    print("============================================= VQA Process for CLIP Model started =============================================")
+    batch_size = args.batch_size
+    print(
+        f"============================================= VQA Process for CLIP Model started with batch size {batch_size}. =============================================")
     model_configs = get_all_models_with_loaded_instance(model_folder=LOCAL_MODEL_PATH, device=DEVICE)
     processed_datasets = preprocess_vqa_datasets(clip_processor=clip_processor)
+
     for dataset_name, data in processed_datasets.items():
         print(
             f"=================================================================== Processing {dataset_name} ===================================================================")
@@ -227,6 +247,6 @@ if __name__ == "__main__":
             model_configs=model_configs,
             dataset=data,
             device=DEVICE,
-            batch_size=BATCH_SIZE,
+            batch_size=batch_size,  # <-- Updated here
         )
         log_vqa_report(result["results"])
