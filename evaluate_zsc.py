@@ -3,7 +3,7 @@ from transformers import CLIPProcessor, CLIPModel, AutoTokenizer, AutoModel
 import torch
 from tqdm import tqdm
 
-from load_model import get_all_models_with_loaded_instance
+from load_model import get_all_models_with_loaded_instance, TEACHER_ID
 from metrics import compute_zsc_metrics, log_zsc_report
 from dataset_utils import get_device
 from zsc_dataset_utils import preprocess_zsc_datasets
@@ -11,7 +11,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 LOCAL_MODEL_PATH = "Nep_CLIP_Models"
-TEACHER_ID = "openai/clip-vit-base-patch32"
 BATCH_SIZE = 256
 
 

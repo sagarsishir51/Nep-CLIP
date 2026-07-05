@@ -5,7 +5,7 @@ from transformers import CLIPProcessor, CLIPModel, AutoTokenizer, AutoModel
 import torch
 from tqdm import tqdm
 import numpy as np
-from load_model import get_all_models_with_loaded_instance
+from load_model import get_all_models_with_loaded_instance, TEACHER_ID
 from dataset_utils import get_device
 from metrics import log_vqa_report
 from vqa_dataset_utils import preprocess_vqa_datasets
@@ -14,7 +14,6 @@ import argparse
 
 load_dotenv()
 LOCAL_MODEL_PATH = "Nep_CLIP_Models"
-TEACHER_ID = "openai/clip-vit-large-patch14-336"
 BATCH_SIZE = 256
 
 def predict_best_option(similarity):
@@ -63,62 +62,6 @@ def process_dynamic_similarity(similarity_matrix):
         confidences = [scores[idx] for idx, scores in zip(pred_indices, all_option_scores)]
 
     return pred_indices, confidences, all_option_scores
-
-def run_full_report_old(model_configs,dataset, device, batch_size):
-    # 1. Get Image Embeddings once
-    results = {}
-
-    # 2. Loop through each Nepali Text Encoder
-    for name, model in model_configs.items():
-        results = []
-        correct_count = 0
-        total_count = 0
-        for data in dataset:
-            image_values = data["image_values"]
-            text_inputs = data["text_inputs"]
-            eng_text_inputs = data["eng_text_inputs"]
-            correct_idx = data["correct_idx"]
-
-            img_emb = model.get_image_features(image_values=image_values, batch_size=batch_size, device=device)
-            if name == "CLIP-English":
-                txt_emb = model.get_text_features(texts=eng_text_inputs, batch_size=batch_size, device = device)
-            else:
-                txt_emb = model.get_text_features(texts=text_inputs, batch_size=batch_size, device=device)
-            # 3. Compute Similarity
-            similarity = img_emb @ txt_emb.T
-            p_idx, conf, all_scores = predict_best_option(
-                similarity=similarity
-            )
-
-            # Store results
-            res_item = data.copy()
-            res_item['predicted_idx'] = p_idx
-            res_item['confidence'] = conf
-            res_item['all_scores'] = all_scores
-            res_item['is_correct'] = (p_idx == correct_idx)
-            results.append(res_item)
-
-            # Update counters
-            total_count += 1
-            if res_item['is_correct']:
-                correct_count += 1
-
-        # --- Calculate and Print Accuracy ---
-        if total_count > 0:
-            overall_accuracy = (correct_count / total_count) * 100
-            print("\n" + "=" * 30)
-            print(f"FINAL EVALUATION SUMMARY")
-            print("-" * 30)
-            print(f"Total Processed: {total_count}")
-            print(f"Total Correct:   {correct_count}")
-            print(f"Overall Accuracy: {overall_accuracy:.2f}%")
-            print("=" * 30)
-        else:
-            print("No items were processed.")
-
-        # Memory management
-        torch.cuda.empty_cache()
-
 
 def run_full_report(model_configs, dataset, device, batch_size):
     # 1. Get Image Embeddings once
@@ -247,6 +190,6 @@ if __name__ == "__main__":
             model_configs=model_configs,
             dataset=data,
             device=DEVICE,
-            batch_size=batch_size,  # <-- Updated here
+            batch_size=batch_size,
         )
         log_vqa_report(result["results"])
