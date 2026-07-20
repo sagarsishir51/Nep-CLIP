@@ -1,5 +1,6 @@
 import json
 import os
+import time
 
 import torch
 import pandas as pd
@@ -8,6 +9,7 @@ from tqdm.auto import tqdm
 import torchvision
 from datasets import load_dataset
 
+from ALMEvaluationDataset import ALMEvaluationDataset
 from EvaluationDataset import EvaluationDataset
 from VQAEvaluationDataset import VQAEvaluationDataset
 
@@ -79,7 +81,67 @@ def load_cvqa_translated_dataset():
         for item in translated_list if "ID" in item
     }
 
-DATASET_LIST = ["CVQA"]
+
+def load_alm_bench_dataset():
+    """
+    Loads the MBZUAI/ALM-Bench dataset from the local target folder.
+    If the local cache isn't found, it safely falls back to loading it properly.
+    """
+    print("\n[Loading ALM-Bench Dataset]")
+    target_dir = "dataset/alm_bench"
+
+    if not os.path.exists(target_dir) or len(os.listdir(target_dir)) == 0:
+        print(f"  ❌ Error: Local dataset not found in '{target_dir}'. Please run the download function first.")
+        return None
+
+    try:
+        # Point Hugging Face back to the local cache directory we saved it to
+        print(f"  Loading ALM-Bench dataset from local directory: '{target_dir}'...")
+        REPO = "MBZUAI/ALM-Bench"
+        dataset = load_dataset(REPO, cache_dir=target_dir)
+
+        print(f"  ✅ Success! Loaded dataset successfully.")
+        print("  Available splits:", list(dataset.keys()))
+
+        # Pull a sample split to showcase available features
+        first_split = list(dataset.keys())[0]
+        print(f"  Sample features available ({first_split}):", list(dataset[first_split].features.keys()))
+
+        return dataset
+
+    except Exception as e:
+        print(f"  ❌ Error loading dataset: {e}")
+        return None
+
+
+def get_samples_by_type(dataset_dict, question_type="Multiple Choice Questions", split="test"):
+    """
+    Instantly filters the Hugging Face dataset by Question_Type without loading
+    heavy image objects into memory.
+    """
+    if split not in dataset_dict:
+        print(f"❌ Split '{split}' not found in dataset.")
+        return None
+
+    dataset_split = dataset_dict[split]
+
+    # 1. Inspect only the text column to bypass image decoding
+    q_types_column = dataset_split["Question_Type"]
+
+    # 2. Extract indices matching the target type
+    matching_indices = [
+        i for i, q_type in enumerate(q_types_column)
+        if q_type == question_type
+    ]
+
+    # 3. Create a shallow pointer mapping to those indices
+    filtered_dataset = dataset_split.select(matching_indices)
+    print(f"   Found {len(filtered_dataset)} matches out of {len(dataset_split)} total rows.")
+
+    return filtered_dataset
+
+# DATASET_LIST = ["CVQA","ALM"]
+DATASET_LIST = ["ALM"]
 
 
 def preprocess_vqa_datasets(clip_processor):
@@ -105,6 +167,25 @@ def preprocess_vqa_datasets(clip_processor):
             except Exception as e:
                 print(e)
                 print("CVQA dataset not found. First download dataset using script download_dataset.py")
+                continue
+        elif dataset_name == "ALM":
+            try:
+                aml_data = load_alm_bench_dataset()
+                mcq_dataset = get_samples_by_type(dataset_dict=aml_data, question_type="Multiple Choice Questions")
+                dataset = ALMEvaluationDataset(dataset=mcq_dataset, dataset_translated_map = None, image_processor=clip_processor)
+                image_values, text_inputs, eng_text_inputs,labels,languages,categories = dataset.get_all_data()
+                processed_datasets[dataset_name] = {
+                    "image_values": image_values,
+                    "text_inputs": text_inputs,
+                    "eng_text_inputs": eng_text_inputs,
+                    "location_aware_eng_text_inputs": eng_text_inputs,
+                    "labels": labels,
+                    "locations": languages,
+                    "categories": categories
+                }
+            except Exception as e:
+                print(e)
+                print("ALM dataset not found. First download dataset using script download_dataset.py")
                 continue
         else:
             print(f"Dataset {dataset_name} not found.")

@@ -72,11 +72,12 @@ def run_full_report(model_configs, dataset, device, batch_size):
         image_values = dataset["image_values"]
         text_inputs = dataset["text_inputs"]
         eng_text_inputs = dataset["eng_text_inputs"]
-        location_aware_eng_text_inputs = dataset["location_aware_eng_text_inputs"]
+        location_aware_eng_text_inputs = dataset.get("location_aware_eng_text_inputs") or []
         labels = dataset["labels"]
         locations = dataset["locations"]
         categories = dataset["categories"]
-
+        print("image_values",len(image_values))
+        print("eng_text_inputs",len(eng_text_inputs))
         img_emb = model.get_image_features(image_values=image_values, batch_size=batch_size, device=device)
 
         if name == "CLIP-English":
