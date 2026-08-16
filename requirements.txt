@@ -7,3 +7,5 @@ multilingual-clip
 scikit-learn
 torchvision
 datasets
+openpyxl
+krippendorff
