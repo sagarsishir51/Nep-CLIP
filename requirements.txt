@@ -8,4 +8,4 @@ scikit-learn
 torchvision
 datasets
 openpyxl
-krippendorff
+gradio

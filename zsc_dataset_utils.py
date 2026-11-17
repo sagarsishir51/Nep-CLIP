@@ -79,6 +79,33 @@ def get_test_images_for_cifar100(image_path,xtd10_data):
     return test_images, test_captions, test_eng_captions
 
 
+def local_dataset_mapper(mapping_file, img_folder):
+    mapping = pd.read_csv(mapping_file, encoding="utf-8")
+    mapping["image_path"] = mapping["filename"].map(lambda f: os.path.abspath(os.path.join(img_folder, f)))
+    missing = ~mapping["image_path"].map(os.path.exists)
+    if missing.any():
+        print(f"Warning: {missing.sum()} images listed in {mapping_file} not found in {img_folder}")
+        mapping = mapping[~missing]
+
+    # Re-index classes to 0..N-1 so they line up with the label lists
+    classes = mapping.drop_duplicates("class_idx").sort_values("class_idx")
+    class_to_idx = {c: i for i, c in enumerate(classes["class_idx"])}
+    gt_labels = mapping["class_idx"].map(class_to_idx).tolist()
+
+    print(f"Loaded {len(classes)} Nepali labels.")
+
+    return {
+        "image_paths": mapping["image_path"].tolist(),
+        "gt_labels": gt_labels,
+        # Nepali and English labels share the same class order
+        "gt_labels_en": gt_labels,
+        "text_inputs": classes["label_ne"].str.strip().tolist(),
+        "eng_text_inputs": classes["label_en"].str.strip().str.replace("_", " ").tolist(),
+        # Local/Global type of each class, same order as text_inputs
+        "types": classes["type"].str.strip().tolist(),
+    }
+
+
 def preprocess_zsc_datasets(clip_processor):
     processed_datasets = {}
     for dataset_name in DATASET_LIST:
@@ -127,6 +154,21 @@ def preprocess_zsc_datasets(clip_processor):
             except Exception as e:
                 print(e)
                 print("Imagenet dataset not found. First download dataset and configure it with the help of README file")
+                continue
+
+        elif dataset_name == "LOCAL_DATASET":
+            try:
+                img_folder = "dataset/nepali_dataset_zsc"
+                mapping_file = os.path.join(img_folder, "_image_label_mapping.csv")
+                mapped_data = local_dataset_mapper(mapping_file=mapping_file, img_folder=img_folder)
+                gt_labels_en = mapped_data["gt_labels_en"]
+                gt_labels = mapped_data["gt_labels"]
+                test_labels = mapped_data["text_inputs"]
+                test_eng_labels = mapped_data["eng_text_inputs"]
+                test_images = mapped_data["image_paths"]
+            except Exception as e:
+                print(e)
+                print("Local dataset not found. Make sure dataset/nepali_dataset_zsc/_image_label_mapping.csv exists")
                 continue
         else:
             print(f"Dataset {dataset_name} not found.")
