@@ -13,6 +13,8 @@ FLICK_8K_CSV_FILE_NAME="Nep_CLIP_Datasets/flickr8k_nepali_output_google_translat
 FLICK_30K_CSV_FILE_NAME="Nep_CLIP_Datasets/flickr30k_nepali_output_google_translate.csv"
 XTD10_CSV_FILE_NAME="Nep_CLIP_Datasets/xtd10_google_translate.csv"
 XM3600_CSV_FILE_NAME="Nep_CLIP_Datasets/xm3600_google_translate.csv"
+TRAINING_DATA_FILE_NAME="Nep_CLIP_Datasets/Training_Data/training_data_with_pre_processed.parquet"
+
 def get_device():
     if torch.cuda.is_available():
         device = torch.device("cuda")
