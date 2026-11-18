@@ -230,3 +230,56 @@ def log_zsc_report(all_metrics):
         print(f"{model_name:<35} | {perf_str:<45} | {health_str:<35}")
 
     print("=" * len(header) + "\n")
+
+
+def log_vqa_report(all_metrics):
+    """
+    Streamlined ZSC report displaying overall, location, and category accuracies.
+    """
+    # Clean, focused header
+    header = (f"{'Model Checkpoint':<35} | "
+              f"{'Overall Acc':<12} | "
+              f"{'Macro Locations':<14} | "
+              f"{'Macro Cats':<12} | "
+              f"{'Correct / Total Records':<25}")
+
+    print("\n" + "=" * len(header))
+    print(header)
+    print("-" * len(header))
+
+    # Sort models by numeric value in their filename if possible
+    try:
+        sorted_models = sorted(all_metrics.items(), key=lambda x: get_numeric_step(x[0]))
+    except NameError:
+        sorted_models = sorted(all_metrics.items())
+
+    for model_name, metrics in sorted_models:
+        # Extract fields from your updated result format
+        overall_acc = metrics.get('overall_accuracy_percentage', 0.0)
+        macro_locations = metrics.get('macro_accuracy_locations', 0.0)
+        macro_cats = metrics.get('macro_accuracy_categories', 0.0)
+        num_correct = metrics.get('num_correct', 0)
+        total_records = metrics.get('total_records', 0)
+
+        # Print the main summary line for the model
+        print(f"{model_name:<35} | "
+              f"{overall_acc:>10.2f}% | "
+              f"{macro_locations:>13.2f}% | "
+              f"{macro_cats:>11.2f}% | "
+              f"{num_correct:>9} / {total_records:<13}")
+
+        # Inline breakdown for Locations
+        location_data = metrics.get('location_accuracies', {})
+        if location_data:
+            location_strs = [f"{sub}: {acc:.1f}%" for sub, acc in location_data.items()]
+            print(f"   ↳ Locations:    {', '.join(location_strs)}")
+
+        # Inline breakdown for Categories
+        category_data = metrics.get('category_accuracies', {})
+        if category_data:
+            cat_strs = [f"{cat}: {acc:.1f}%" for cat, acc in category_data.items()]
+            print(f"   ↳ Categories: {', '.join(cat_strs)}")
+
+        print("-" * len(header))
+
+    print("=" * len(header) + "\n")

@@ -39,7 +39,7 @@ DISTILLED_MODELS_CONFIG = {
     },
     "CLIP-English":{
         "name": "CLIP-English",
-        "teacher_id":"openai/clip-vit-base-patch32",
+        "teacher_id":"openai/clip-vit-base-patch32"
         },
     "CLIP (Nepali input)": {
         "name": "CLIP (Nepali input)",

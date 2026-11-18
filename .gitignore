@@ -10,3 +10,9 @@ venv_nep_clip
 __pycache__
 configuration_nllb_clip.py
 modeling_nllb_clip.py
+*.npz
+
+evaluate_translation/rater_sheets/*
+analysis/*
+nepalidataset/*
+local_zsc_predictions.csv
