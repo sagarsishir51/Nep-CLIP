@@ -10,7 +10,6 @@ from zsc_dataset_utils import preprocess_zsc_datasets
 from dotenv import load_dotenv
 
 load_dotenv()
-LOCAL_MODEL_PATH = "Nep_CLIP_Models"
 BATCH_SIZE = 256
 
 
@@ -48,7 +47,7 @@ if __name__ == "__main__":
     DEVICE = get_device()
     clip_processor = CLIPProcessor.from_pretrained(TEACHER_ID)
     print("============================================= Zero Shot Classification Process for CLIP Model started =============================================")
-    model_configs = get_all_models_with_loaded_instance(model_folder=LOCAL_MODEL_PATH, device=DEVICE)
+    model_configs = get_all_models_with_loaded_instance(device=DEVICE)
     processed_datasets = preprocess_zsc_datasets(clip_processor=clip_processor)
     for dataset_name, data in processed_datasets.items():
         print(f"=================================================================== Processing {dataset_name} ===================================================================")

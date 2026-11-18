@@ -10,20 +10,23 @@ from model.NLLB_Model import NLLB_Model
 from model.NepClip_Model import NepClip_Model
 
 TEACHER_ID = "openai/clip-vit-base-patch32"
+HF_MODEL_REPO = "sagarsishir51/Nep-CLIP"   # Hugging Face repo holding the distilled checkpoints
 
 DISTILLED_MODELS_CONFIG = {
     "BERT": {
         "name":"BERT",
         "id": "Shushant/nepaliBERT",
         "teacher_id": "openai/clip-vit-base-patch32",
-        "file_name": "Shushant-nepaliBERT distillation_epoch_4_step_150000.pt"
+        "hf_repo": HF_MODEL_REPO,
+        "hf_file": "nep-clip-nepaliBERT/model.pt"
     },
     "RoBERTa":
         {
             "name": "RoBERTa",
             "id": "IRIISNEPAL/RoBERTa_Nepali_110M",
              "teacher_id": "openai/clip-vit-base-patch32",
-            "file_name": "RoBERTa_Nepali_110M distillation_epoch_4_step_150000.pt"
+            "hf_repo": HF_MODEL_REPO,
+            "hf_file": "nep-clip-roberta/model.pt"
         },
     "NLLB-CLIP":
         {
@@ -47,7 +50,7 @@ DISTILLED_MODELS_CONFIG = {
     }
 }
 
-def get_all_models_with_loaded_instance(model_folder, device):
+def get_all_models_with_loaded_instance(device):
     models_dict = {}
     required_version = "4.38.2"
     current_version = transformers.__version__
@@ -78,6 +81,6 @@ def get_all_models_with_loaded_instance(model_folder, device):
                 models_dict[student_key] = CLIP_Model(config=config)
             else:
                 print(f"Loading {student_key} fallback instance...")
-                models_dict[student_key] = NepClip_Model(config=config, model_path=model_folder, device=device)
+                models_dict[student_key] = NepClip_Model(config=config, device=device)
 
     return models_dict

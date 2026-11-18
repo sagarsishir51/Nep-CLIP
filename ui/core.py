@@ -17,7 +17,6 @@ from model.NepClip_Model import NepClip_Model       # adjust path if different
 # ---------------------------------------------------------------------------
 # Config / constants
 # ---------------------------------------------------------------------------
-MODEL_PATH = os.path.join(ROOT, "Nep_CLIP_Models")
 INDEX_PATH = os.path.join(ROOT, "index.npz")
 DEVICE = "cuda" if torch.cuda.is_available() else (
     "mps" if getattr(torch.backends, "mps", None) and torch.backends.mps.is_available() else "cpu"
@@ -64,7 +63,7 @@ _MODELS = {}   # name -> NepClip_Model
 def get_model(name):
     if name not in _MODELS:
         print(f"Loading model '{name}'...")
-        _MODELS[name] = NepClip_Model(config=CONFIGS[name], model_path=MODEL_PATH, device=DEVICE)
+        _MODELS[name] = NepClip_Model(config=CONFIGS[name], device=DEVICE)
     return _MODELS[name]
 
 

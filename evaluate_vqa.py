@@ -13,7 +13,6 @@ from dotenv import load_dotenv
 import argparse
 
 load_dotenv()
-LOCAL_MODEL_PATH = "Nep_CLIP_Models"
 BATCH_SIZE = 256
 
 def predict_best_option(similarity):
@@ -181,7 +180,7 @@ if __name__ == "__main__":
     batch_size = args.batch_size
     print(
         f"============================================= VQA Process for CLIP Model started with batch size {batch_size}. =============================================")
-    model_configs = get_all_models_with_loaded_instance(model_folder=LOCAL_MODEL_PATH, device=DEVICE)
+    model_configs = get_all_models_with_loaded_instance(device=DEVICE)
     processed_datasets = preprocess_vqa_datasets(clip_processor=clip_processor)
 
     for dataset_name, data in processed_datasets.items():
