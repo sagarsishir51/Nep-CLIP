@@ -12,8 +12,8 @@ class NLLB_Model:
         teacher_id = config["teacher_id"]
 
         # Download the custom code locally to initialize the exact runtime architecture
-        hf_hub_download(repo_id=repo_id, filename="configuration_nllb_clip.py", local_dir="..")
-        hf_hub_download(repo_id=repo_id, filename="modeling_nllb_clip.py", local_dir="..")
+        hf_hub_download(repo_id=repo_id, filename="configuration_nllb_clip.py", local_dir=".")
+        hf_hub_download(repo_id=repo_id, filename="modeling_nllb_clip.py", local_dir=".")
         from modeling_nllb_clip import NLLBCLIPModel
 
         self.model = NLLBCLIPModel.from_pretrained(repo_id)
