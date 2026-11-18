@@ -1,4 +1,4 @@
-import os
+from huggingface_hub import hf_hub_download
 from transformers import AutoTokenizer, CLIPProcessor,CLIPModel
 import torch
 from tqdm import tqdm
@@ -7,7 +7,7 @@ import torch.nn.functional as F
 
 
 class NepClip_Model:
-    def __init__(self,config,model_path,device):
+    def __init__(self,config,device):
         self.name = config["name"]
         teacher_id = config["teacher_id"]
         student_id = config["id"]
@@ -15,18 +15,15 @@ class NepClip_Model:
         self.model = CLIPModel.from_pretrained(teacher_id)
         best_kw = {'do_lower_case': False, 'strip_accents': False}
         self.tokenizer = AutoTokenizer.from_pretrained(student_id, **best_kw)
-        self.nep_clip_encoder = self.load_nep_clip_encoder(model_folder=model_path, config=config, device=device)
+        self.nep_clip_encoder = self.load_nep_clip_encoder(config=config, device=device)
 
-    def load_nep_clip_encoder(self,model_folder, config, device):
+    def load_nep_clip_encoder(self, config, device):
         student_id = config["id"]
-        ckpt_name = config["file_name"]
+        ckpt_name = f'{config["hf_repo"]}/{config["hf_file"]}'
 
+        # 1. Download the checkpoint from Hugging Face (cached after the first run)
         print(f"Loading weights from: {ckpt_name}")
-        ckpt_path = os.path.join(model_folder, ckpt_name)
-
-        # Check if the file actually exists before processing
-        if not os.path.exists(ckpt_path):
-            print(f" ⚠️ Checkpoint file not found: {ckpt_path}. Skipping.")
+        ckpt_path = hf_hub_download(repo_id=config["hf_repo"], filename=config["hf_file"])
 
         # 2. Initialize a fresh instance of the encoder using the HuggingFace ID
         nep_clip_encoder = NepClipEncoder(student_id)

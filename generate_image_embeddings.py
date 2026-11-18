@@ -39,10 +39,10 @@ def pick_device(prefer=None):
 _model = None
 
 
-def load_model(config, model_path, device=None):
+def load_model(config, device=None):
     """`config` is a dict (or path to a JSON file) with keys:
-        name, teacher_id, id, file_name
-    `model_path` is the folder containing the checkpoint (config['file_name']).
+        name, teacher_id, id, hf_repo, hf_file
+    The checkpoint is downloaded from Hugging Face (config['hf_repo'] / config['hf_file']).
     """
     global _model
     if _model is None:
@@ -50,7 +50,7 @@ def load_model(config, model_path, device=None):
             with open(config) as f:
                 config = json.load(f)
         device = pick_device(device)
-        _model = NepClip_Model(config=config, model_path=model_path, device=device)
+        _model = NepClip_Model(config=config, device=device)
         _model._device = device            # stash for later calls
     return _model
 
@@ -173,7 +173,6 @@ DEFAULT_PATHS = [
 ]
 DEFAULT_OUT = "index.npz"
 DEFAULT_CONFIG = DISTILLED_MODELS_CONFIG["BERT"]
-DEFAULT_MODEL_PATH = "Nep_CLIP_Models"
 DEFAULT_CHUNK_SIZE = 256
 DEFAULT_DEVICE = "mps"            # None -> auto (cuda / mps / cpu)
 
@@ -186,12 +185,10 @@ if __name__ == "__main__":
                         help="Directories, files, or glob patterns.")
     parser.add_argument("--out", default=DEFAULT_OUT)
     parser.add_argument("--config", default=DEFAULT_CONFIG,
-                        help="JSON with name/teacher_id/id/file_name.")
-    parser.add_argument("--model-path", default=DEFAULT_MODEL_PATH,
-                        help="Folder containing the checkpoint file.")
+                        help="JSON with name/teacher_id/id/hf_repo/hf_file.")
     parser.add_argument("--chunk-size", type=int, default=DEFAULT_CHUNK_SIZE)
     parser.add_argument("--device", default=DEFAULT_DEVICE)
     args = parser.parse_args()
 
-    model = load_model(args.config, args.model_path, args.device)
+    model = load_model(args.config, args.device)
     build_index(model, args.paths, args.out, args.chunk_size)

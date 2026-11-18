@@ -56,9 +56,9 @@ Evaluation datasets translated into Nepali using Google Translate and IndicTrans
 
 ## 🧠 Pretrained Models
 
-The distilled Nep-CLIP checkpoints are publicly available for educational use.
+The distilled Nep-CLIP checkpoints are publicly available on Hugging Face for educational use. The code downloads them automatically (see step 6).
 
-> 🔗 <a href="https://drive.google.com/drive/u/1/folders/1ZY_gS27NwRj5RoZFb-yCj9kh-i09WjCh?usp=sharing" target="_blank" rel="noopener noreferrer"><b>Download Nep-CLIP Models (Google Drive)</b></a>
+> 🤗 <a href="https://huggingface.co/sagarsishir51/Nep-CLIP" target="_blank" rel="noopener noreferrer"><b>Nep-CLIP Models (Hugging Face)</b></a>
 >
 > ⚠️ For **educational use only**. See [License](#-license).
 
@@ -69,7 +69,7 @@ The distilled Nep-CLIP checkpoints are publicly available for educational use.
 **Checkpoint**
 
 ```
-RoBERTa_Nepali_110M_distillation_epoch_4_step_150000.pt
+sagarsishir51/Nep-CLIP / nep-clip-roberta/model.pt
 ```
 
 **Description**
@@ -83,7 +83,7 @@ A distilled Nep-CLIP model using a 110M parameter Nepali RoBERTa encoder trained
 **Checkpoint**
 
 ```
-Shushant-nepaliBERT_distillation_epoch_4_step_150000.pt
+sagarsishir51/Nep-CLIP / nep-clip-nepaliBERT/model.pt
 ```
 
 **Description**
@@ -215,7 +215,6 @@ Nep-CLIP/
 │
 ├── dataset/                        # evaluation and local Nepali image datasets (steps 4–5; not in git)
 ├── Nep_CLIP_Datasets/              # Nep-CLIP datasets (step 5; not in git)
-├── Nep_CLIP_Models/                # pretrained checkpoints (step 6; not in git)
 └── index.npz                       # image index for the demo app (step 10; not in git)
 ```
 
@@ -366,28 +365,30 @@ The processed Nepali image-text pairs are publicly available for educational use
 >
 > * Refer to the **Datasets** section for details on about the datasets.
 
-## 6. Download Pretrained Models
+## 6. Pretrained Models (Hugging Face)
 
-Download the pretrained **Nep-CLIP** checkpoints from the link below.
+No manual download is needed. The distilled **Nep-CLIP** checkpoints are hosted on Hugging Face and are downloaded automatically the first time a script or the demo app loads a Nep-CLIP model.
 
-The distilled Nep-CLIP checkpoints are publicly available for educational use.
-
-> 🔗 <a href="https://drive.google.com/drive/u/1/folders/1ZY_gS27NwRj5RoZFb-yCj9kh-i09WjCh?usp=sharing" target="_blank" rel="noopener noreferrer"><b>Download Nep-CLIP Models (Google Drive)</b></a>
+> 🤗 <a href="https://huggingface.co/sagarsishir51/Nep-CLIP" target="_blank" rel="noopener noreferrer"><b>Nep-CLIP Models (Hugging Face)</b></a>
 >
 > ⚠️ For **educational use only**. See [License](#-license).
 
+| Model | Hugging Face file |
+|---|---|
+| Nep-CLIP (RoBERTa) | `nep-clip-roberta/model.pt` |
+| Nep-CLIP (BERT) | `nep-clip-nepaliBERT/model.pt` |
+
+To download them in advance (for example, before working offline):
+
+```bash
+hf download sagarsishir51/Nep-CLIP
+```
+
 > **Note**
 >
-> * After downloading, place the checkpoints in the following directory:
->
-> ```text
-> Nep_CLIP_Models/
-> ├── RoBERTa_Nepali_110M_distillation_epoch_4_step_150000.pt
-> └── Shushant-nepaliBERT_distillation_epoch_4_step_150000.pt
-> ```
->
-> Ensure the checkpoint filenames match exactly as shown above.
->
+> * The first run needs an internet connection and downloads about **2.8 GB**. The files are cached (by default in `~/.cache/huggingface/hub`), so later runs reuse them.
+> * To run fully offline after the first download, set `HF_HUB_OFFLINE=1`.
+> * The repository and file names are set in `load_model.py` (`HF_MODEL_REPO` and each model's `hf_file`).
 > * Refer to the **Pretrained Models** section for details on the pretrained checkpoints.
 
 ## 7. Run Image Retrieval Evaluation
@@ -475,7 +476,6 @@ Optional arguments:
 ```bash
 python3 generate_image_embeddings.py --paths dataset/nepali_dataset dataset/xtd10 \
                                      --out index.npz \
-                                     --model-path Nep_CLIP_Models \
                                      --chunk-size 256 \
                                      --device cuda
 ```
@@ -484,7 +484,6 @@ python3 generate_image_embeddings.py --paths dataset/nepali_dataset dataset/xtd1
 |---|---|---|
 | `--paths` | `dataset/nepali_dataset` | One or more image folders, files or glob patterns. Supported formats: `.jpg`, `.jpeg`, `.png`, `.bmp`, `.webp`, `.gif`, `.tiff` |
 | `--out` | `index.npz` | Output file. Keep `index.npz` for the app |
-| `--model-path` | `Nep_CLIP_Models` | Folder containing the Nep-CLIP checkpoints |
 | `--chunk-size` | `256` | Images encoded per batch. Lower it if you run out of memory |
 | `--device` | `mps` | `cuda`, `mps` (Apple Silicon) or `cpu` |
 
@@ -504,7 +503,7 @@ The demo is a Gradio web app in the `ui/` folder with two screens:
 
 Before starting, make sure you have:
 
-* the pretrained models in `Nep_CLIP_Models/` (step 6),
+* an internet connection on the first run, to download the pretrained models from Hugging Face (step 6),
 * `index.npz` in the repository root (step 10), needed only for Image Retrieval.
 
 Run:
@@ -614,6 +613,6 @@ Nep-CLIP builds on the following open models, datasets and tools:
 
 The Nep-CLIP code is released under the [MIT License](LICENSE).
 
-The **Nep-CLIP datasets** and **pretrained model checkpoints** shared through the Google Drive links in this README are provided for **educational purposes only**. They may not be used for commercial purposes. The MIT License above applies to the code only, not to these datasets and models.
+The **Nep-CLIP datasets** and **pretrained model checkpoints** shared through the Google Drive and Hugging Face links in this README are provided for **educational purposes only**. They may not be used for commercial purposes. The MIT License above applies to the code only, not to these datasets and models.
 
 The pretrained models, datasets and third-party components listed in **Acknowledgements** keep their own licenses and terms of use. In particular, ImageNet and some image-caption datasets are restricted to non-commercial research use. Check each source's license before using it.

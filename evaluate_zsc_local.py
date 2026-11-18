@@ -14,7 +14,6 @@ from EvaluationDataset import EvaluationDataset
 from zsc_dataset_utils import local_dataset_mapper
 
 load_dotenv()
-LOCAL_MODEL_PATH = "Nep_CLIP_Models"
 BATCH_SIZE = 256
 TEMPERATURE = 0.05
 IMG_FOLDER = "dataset/nepali_dataset_zsc"
@@ -121,7 +120,7 @@ def main():
 
     device = get_device()
     clip_processor = CLIPProcessor.from_pretrained(TEACHER_ID)
-    model_configs = get_all_models_with_loaded_instance(model_folder=LOCAL_MODEL_PATH, device=device)
+    model_configs = get_all_models_with_loaded_instance(device=device)
 
     mapped_data = local_dataset_mapper(mapping_file=args.mapping, img_folder=args.images)
     dataset = EvaluationDataset(image_paths=mapped_data["image_paths"], test_texts=mapped_data["text_inputs"],
